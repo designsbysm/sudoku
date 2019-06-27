@@ -1,0 +1,90 @@
+html {
+  font-size: 14px;
+
+  @media only screen and (min-width: 480px) {
+    font-size: 16px;
+  }
+}
+
+body {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+  text-size-adjust: none; //correct text heights on iPhone
+}
+
+.content {
+  display: grid;
+  grid-column-gap: 3em;
+  grid-template-columns: 33em 1fr;
+  margin: 1em;
+
+  // main {
+  // }
+
+  aside {
+    width: 18em;
+
+    .commands {
+      border: 1px solid #bec6d4;
+      border-top: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+
+      .button {
+        padding: 1em;
+        // height: 5em;
+
+        svg {
+          margin-bottom: 0.25em;
+        }
+
+        &:nth-child(n + 3) {
+          border-bottom: 0;
+        }
+
+        &:nth-child(2n) {
+          border-right: 0;
+        }
+      }
+    }
+
+    .number-pad {
+      border: 1px solid #bec6d4;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+
+      .button {
+        font-size: 32px;
+        // padsding: 0.5em;
+
+        &:nth-child(n + 7) {
+          border-bottom: 0;
+        }
+
+        &:nth-child(3n) {
+          border-right: 0;
+        }
+      }
+    }
+
+    .button {
+      border-bottom: 1px solid #bec6d4;
+      border-right: 1px solid #bec6d4;
+      cursor: pointer;
+      display: grid;
+      min-height: 3em;
+
+      place-content: center;
+      place-items: center;
+
+      &:hover {
+        background: rgba(#bec6d4, 0.4);
+      }
+    }
+  }
+}

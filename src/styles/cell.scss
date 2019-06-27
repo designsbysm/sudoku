@@ -1,0 +1,71 @@
+.cell {
+  border-bottom: 1px solid #000;
+  border-right: 1px solid #000;
+  cursor: pointer;
+  display: grid;
+  padding: 0.1em;
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+
+    .item {
+      color: #666;
+      font-size: 12px;
+      place-self: center;
+    }
+
+    &.hide {
+      display: none;
+    }
+  }
+
+  .value {
+    font-size: 32px;
+    font-weight: 400;
+    place-self: center;
+
+    &.hide {
+      display: none;
+    }
+  }
+
+  // &:nth-child(odd) {
+  //   background: rgba(#bec6d4, 0.2);
+  // }
+
+  &.predefined {
+    background: rgba(#bec6d4, 0.6);
+  }
+
+  &.current {
+    background: rgba(#bec6d4, 0.4);
+  }
+
+  &.error {
+    background: rgba(#f00, 0.6);
+  }
+
+  &.success {
+    background: rgba(#0f0, 0.6);
+  }
+
+  &:nth-child(3n) {
+    border-right: 3px solid #000;
+  }
+
+  &:nth-child(n + 19):nth-child(-n + 27),
+  &:nth-child(n + 46):nth-child(-n + 54),
+  &:nth-child(n + 73) {
+    border-bottom: 3px solid #000;
+  }
+
+  &:nth-child(9n) {
+    border-right: 0;
+  }
+
+  &:nth-child(n + 73) {
+    border-bottom: 0;
+  }
+}
