@@ -1,5 +1,4 @@
-import KeyboardEventHandler from "react-keyboard-event-handler";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 //components
@@ -143,25 +142,25 @@ const moveCurrent = (key, col, row) => {
   let newRow = row;
 
   switch (key) {
-    case "left":
+    case "ArrowLeft":
       if (col > 0) {
         newColumn -= 1;
       }
       break;
 
-    case "right":
+    case "ArrowRight":
       if (col < 8) {
         newColumn += 1;
       }
       break;
 
-    case "up":
+    case "ArrowUp":
       if (row > 0) {
         newRow -= 1;
       }
       break;
 
-    case "down":
+    case "ArrowDown":
       if (row < 8) {
         newRow += 1;
       }
@@ -279,7 +278,7 @@ const updateCellValue = (key, cells, current) => {
   const { column, row } = current;
 
   let newValue = parseInt(key, 10);
-  if (key === "backspace") {
+  if (key === "Backspace") {
     newValue = 0;
   }
 
@@ -313,11 +312,63 @@ const App = () => {
     setPenMode, 
   ] = useState(true);
 
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  });
+
+  const handleKeydown = event => {
+    const { key } = event;
+
+    switch (key) {
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "ArrowUp":
+        const { column, row } = current;
+        const newPosition = moveCurrent(key, column, row);
+
+        if (newPosition) {
+          setCurrent(newPosition);
+        }
+
+        break;
+
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+      case "Backspace":
+        updateCell(key);
+        break;
+
+      case "h":
+      case "H":
+        hintCell(cells, current);
+        break;
+
+      case "n":
+      case "N":
+        setPenMode(!penMode);
+        break;
+
+      default:
+    }
+  };
+
   const hintCell = () => {
     const update = hintCellValue(cells, current);
     console.log(isGameComplete(update));
 
-    // setCells(update);
+    setCells(update);
   };
 
   const resetCurrent = () => {
@@ -410,28 +461,6 @@ const App = () => {
           </div>
         </div>
       </aside>
-      <KeyboardEventHandler
-        handleKeys={[
-          "down",
-          "left",
-          "right",
-          "up", 
-        ]}
-        onKeyEvent={key => {
-          const { column, row } = current;
-          const newPosition = moveCurrent(key, column, row);
-
-          if (newPosition) {
-            setCurrent(newPosition);
-          }
-        }}
-      />
-      <KeyboardEventHandler handleKeys={[
-        "backspace",
-        "numeric", 
-      ]} onKeyEvent={key => updateCell(key)} />
-      <KeyboardEventHandler handleKeys={[ "h" ]} onKeyEvent={key => hintCell(cells, current)} />
-      <KeyboardEventHandler handleKeys={[ "n" ]} onKeyEvent={key => setPenMode(!penMode)} />
     </section>
   );
 };
