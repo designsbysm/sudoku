@@ -715,6 +715,14 @@ const App = () => {
     setCurrent(initialCurrentCell);
   };
 
+  const startGame=()=>{
+    const game = newGame(setupCells());
+    const possibles = getPossibleValues(game);
+    const updated = applyPossibleValues(game, possibles);
+
+    setCells(updated);
+  };
+
   const updateCell = key => {
     let update = null;
 
@@ -766,11 +774,7 @@ const App = () => {
 
   useEffect(() => {
     if (!mounted) {
-      const game = newGame(setupCells());
-      const possibles = getPossibleValues(game);
-      const updated = applyPossibleValues(game, possibles);
-
-      setCells(updated);
+      startGame();
       setMounted(true);
     }
   }, [ mounted ]);
@@ -835,7 +839,7 @@ const App = () => {
             <FontAwesomeIcon icon={faLightbulb} size="2x" />
             Hint
           </div>
-          <div onClick={() => setCells(newGame(setupCells()))} className="button">
+          <div onClick={() => startGame()} className="button">
             <FontAwesomeIcon icon={faPlus} size="2x" />
             New Game
           </div>
