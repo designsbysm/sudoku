@@ -406,17 +406,15 @@ const possibleLoneRangers = cells => {
     const count = {};
 
     set.forEach(cell => {
-      if (cell.possible.length > 1) {
-        cell.possible.forEach(value => {
-          count[value] = count[value] ? count[value] + 1 : 1;
-        });
-      }
+      cell.possible.forEach(value => {
+        count[value] = count[value] ? count[value] + 1 : 1;
+      });
     });
 
     for (const key of Object.keys(count)) {
       if (count[key] === 1) {
         set.forEach(cell => {
-          if (cell.possible.includes(key)) {
+          if (cell.possible.includes(parseInt(key, 10))) {
             cell.possible = cell.possible.filter(value => value === parseInt(key, 10));
           }
         });
