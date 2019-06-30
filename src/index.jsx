@@ -94,7 +94,7 @@ const getPossibleValues = cells => {
   /* eslint-disable sort-keys */
   const pipeline = {
     crme: possibleCRME,
-    loneRangers: possibleLoneRangers,
+    lone: possibleLoneRangers,
     twins: possibleTwins,
     triplets: possibleTriplets,
   };
@@ -272,30 +272,6 @@ const newGame = cells => {
   const update = [ ...cells ];
 
   /* eslint-disable array-element-newline */
-  // const solution = [
-  //   [ 3, 9, 5, 4, 6, 7, 1, 8, 2 ],
-  //   [ 1, 4, 6, 2, 8, 9, 5, 3, 7 ],
-  //   [ 2, 7, 8, 5, 1, 3, 6, 9, 4 ],
-  //   [ 4, 5, 1, 9, 3, 8, 7, 2, 6 ],
-  //   [ 9, 8, 7, 6, 4, 2, 3, 1, 5 ],
-  //   [ 6, 2, 3, 7, 5, 1, 9, 4, 8 ],
-  //   [ 5, 6, 2, 3, 9, 4, 8, 7, 1 ],
-  //   [ 8, 3, 4, 1, 7, 5, 2, 6, 9 ],
-  //   [ 7, 1, 9, 8, 2, 6, 4, 5, 3 ],
-  // ];
-
-  // const puzzle = [
-  //   [ 0, 0, 5, 4, 0, 0, 1, 8, 0 ],
-  //   [ 1, 4, 6, 0, 8, 0, 5, 0, 0 ],
-  //   [ 0, 7, 0, 0, 1, 3, 0, 0, 0 ],
-  //   [ 4, 5, 1, 0, 0, 8, 7, 0, 6 ],
-  //   [ 0, 8, 0, 0, 0, 0, 0, 1, 0 ],
-  //   [ 6, 0, 3, 7, 0, 0, 9, 4, 8 ],
-  //   [ 0, 0, 0, 3, 9, 0, 0, 7, 0 ],
-  //   [ 0, 0, 4, 0, 7, 0, 2, 6, 9 ],
-  //   [ 0, 1, 9, 0, 0, 6, 4, 0, 0 ],
-  // ];
-
   const solution = [
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -308,17 +284,58 @@ const newGame = cells => {
     [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
   ];
 
+  // easy
+  // const puzzle = [
+  //   [ 0, 0, 5, 4, 0, 0, 1, 8, 0 ],
+  //   [ 1, 4, 6, 0, 8, 0, 5, 0, 0 ],
+  //   [ 0, 7, 0, 0, 1, 3, 0, 0, 0 ],
+  //   [ 4, 5, 1, 0, 0, 8, 7, 0, 6 ],
+  //   [ 0, 8, 0, 0, 0, 0, 0, 1, 0 ],
+  //   [ 6, 0, 3, 7, 0, 0, 9, 4, 8 ],
+  //   [ 0, 0, 0, 3, 9, 0, 0, 7, 0 ],
+  //   [ 0, 0, 4, 0, 7, 0, 2, 6, 9 ],
+  //   [ 0, 1, 9, 0, 0, 6, 4, 0, 0 ],
+  // ];
+
+  // medium
+  // const puzzle = [
+  //   [ 7, 6, 0, 1, 3, 0, 4, 5, 0 ],
+  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
+  //   [ 1, 0, 0, 9, 0, 0, 0, 2, 0 ],
+  //   [ 2, 0, 5, 0, 0, 7, 0, 0, 0 ],
+  //   [ 0, 4, 0, 8, 6, 9, 0, 7, 0 ],
+  //   [ 0, 0, 0, 5, 0, 0, 1, 0, 9 ],
+  //   [ 0, 1, 0, 0, 0, 4, 0, 0, 5 ],
+  //   [ 9, 0, 0, 0, 0, 0, 0, 0, 0 ],
+  //   [ 0, 7, 3, 0, 9, 5, 0, 6, 1 ],
+  // ];
+
+  // difficult
   const puzzle = [
-    [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
-    [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
-    [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
-    [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
-    [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
-    [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
-    [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 6, 0, 0, 2, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 7 ],
+    [ 0, 0, 0, 1, 0, 4, 0, 0, 9 ],
+    [ 0, 0, 4, 0, 0, 0, 9, 0, 5 ],
+    [ 0, 5, 2, 0, 0, 6, 0, 7, 0 ],
+    [ 9, 0, 7, 0, 0, 0, 6, 0, 0 ],
+    [ 7, 0, 0, 6, 0, 3, 0, 0, 0 ],
+    [ 6, 3, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 9, 0, 0, 1, 0, 0, 0, 0 ],
   ];
+
+  // extreme
+  // const puzzle = [
+  //   [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
+  //   [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
+  //   [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
+  //   [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
+  //   [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
+  //   [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
+  //   [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
+  //   [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
+  //   [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
+  // ];
+
   /* eslint-enable array-element-newline */
 
   for (let row = 1; row < 10; row++) {
@@ -399,7 +416,7 @@ const possibleLoneRangers = cells => {
     for (const key of Object.keys(count)) {
       if (count[key] === 1) {
         set.forEach(cell => {
-          if (cell.possible.includes(parseInt(key, 10))) {
+          if (cell.possible.includes(key)) {
             cell.possible = cell.possible.filter(value => value === parseInt(key, 10));
           }
         });
@@ -421,21 +438,27 @@ const possibleLoneRangers = cells => {
 };
 
 const possibleTriplets = cells => {
-  const searchSet = set => {
-    const update = [ ...set ];
+  const countKeys = set => {
     const possibles = set.map(cell => cell.possible.join(""));
     const count = {};
 
     possibles.forEach(cell => {
-      if (cell.length === 2) {
+      if (cell.length === 2 || cell.length === 3) {
         count[cell] = count[cell] ? count[cell] + 1 : 1;
       }
     });
 
+    return count;
+  };
+
+  const searchSet = set => {
+    const count = countKeys(set);
+
+    // (3)3x triplets
     for (const key of Object.keys(count)) {
-      if (count[key] === 2) {
-        update.forEach(cell => {
-          if (cell.possible.length > 2) {
+      if (count[key] === 3) {
+        set.forEach(cell => {
+          if (cell.possible.join("") !== key && cell.possible.length > 1) {
             const values = [ ...key ].map(value => parseInt(value, 10));
 
             cell.possible = cell.possible.filter(value => !values.includes(value));
@@ -444,7 +467,53 @@ const possibleTriplets = cells => {
       }
     }
 
-    return update;
+    // (2)3x + (1)2x triplet
+    for (const threeKey of Object.keys(count)) {
+      if (threeKey.length === 3 && count[threeKey] === 2) {
+        for (const twoKey of Object.keys(count)) {
+          if (twoKey.length === 2 && count[twoKey] === 1) {
+            if ([ ...twoKey ].every(value => threeKey.includes(value))) {
+              set.forEach(cell => {
+                if (
+                  cell.possible.join("") !== twoKey &&
+                  cell.possible.join("") !== threeKey &&
+                  cell.possible.length > 1
+                ) {
+                  const values = [ ...threeKey ].map(value => parseInt(value, 10));
+
+                  cell.possible = cell.possible.filter(value => !values.includes(value));
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // (1)3x + (2)2x  triplet
+    const found = [];
+    for (const threeKey of Object.keys(count)) {
+      if (threeKey.length === 3 && count[threeKey] === 1) {
+        for (const twoKey of Object.keys(count)) {
+          if (twoKey.length === 2 && count[twoKey] === 1) {
+            if ([ ...twoKey ].every(value => threeKey.includes(value))) {
+              found.push(threeKey);
+              found.push(twoKey);
+            }
+          }
+        }
+
+        if (found.length === 3) {
+          console.log(found);
+          set.forEach(cell => {
+            if (found.every(value => cell.possible.join("") !== value) && cell.possible.length > 1) {
+              const values = [ ...threeKey ].map(value => parseInt(value, 10));
+              cell.possible = cell.possible.filter(value => !values.includes(value));
+            }
+          });
+        }
+      }
+    }
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -462,7 +531,6 @@ const possibleTriplets = cells => {
 
 const possibleTwins = cells => {
   const searchSet = set => {
-    const update = [ ...set ];
     const possibles = set.map(cell => cell.possible.join(""));
     const count = {};
 
@@ -474,8 +542,8 @@ const possibleTwins = cells => {
 
     for (const key of Object.keys(count)) {
       if (count[key] === 2) {
-        update.forEach(cell => {
-          if (cell.possible.length > 2) {
+        set.forEach(cell => {
+          if (cell.possible.join("") !== key && cell.possible.length > 1) {
             const values = [ ...key ].map(value => parseInt(value, 10));
 
             cell.possible = cell.possible.filter(value => !values.includes(value));
@@ -483,8 +551,6 @@ const possibleTwins = cells => {
         });
       }
     }
-
-    return update;
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -656,7 +722,10 @@ const App = () => {
 
     if (penMode) {
       update = updateCellValue(key, cells, current);
-      // console.log(update);
+
+      const possibles = getPossibleValues(update);
+      update = applyPossibleValues(update, possibles);
+
       update = isStillMoveValid(update);
       console.log(isGameComplete(update));
     } else {
