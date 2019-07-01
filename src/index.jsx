@@ -715,7 +715,7 @@ const App = () => {
     setCurrent(initialCurrentCell);
   };
 
-  const startGame=()=>{
+  const startGame = () => {
     const game = newGame(setupCells());
     const possibles = getPossibleValues(game);
     const updated = applyPossibleValues(game, possibles);
@@ -780,21 +780,9 @@ const App = () => {
   }, [ mounted ]);
 
   return (
-    <section
-      className="content"
-      // onClick={() => {
-      //   console.log("main click");
-      // }}
-    >
+    <section className="content">
       <main>
-        <Grid
-          cells={cells}
-          current={current}
-          setCurrent={setCurrent}
-          // onClick={() => {
-          //   console.log("grid click");
-          // }}
-        />
+        <Grid cells={cells} current={current} setCurrent={setCurrent} />
       </main>
       <aside onClick={() => resetCurrent()}>
         <div className="number-pad">
