@@ -477,6 +477,20 @@ const newGame = cells => {
   return update;
 };
 
+const poccessPossibleCells = (cells, fn) => {
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    fn(set);
+  });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
 const possibleCreateUpdate = (cells, possibles) => {
   const updates = cells.map(r => {
     return r.map(cell => {
@@ -513,17 +527,7 @@ const possibleCRME = cells => {
     });
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessPossibleCells(cells, searchSet);
 };
 
 const possibleSingles = cells => {
@@ -547,17 +551,7 @@ const possibleSingles = cells => {
     }
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessPossibleCells(cells, searchSet);
 };
 
 const possibleTriplets = cells => {
@@ -630,17 +624,7 @@ const possibleTriplets = cells => {
     });
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessPossibleCells(cells, searchSet);
 };
 
 const possibleTwins = cells => {
@@ -657,17 +641,7 @@ const possibleTwins = cells => {
     });
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessPossibleCells(cells, searchSet);
 };
 
 const removePossibleSearch = (cells, target) => {
