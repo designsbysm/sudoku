@@ -46,10 +46,10 @@ const Cell = ({ current, props, setCurrent }) => {
         });
       }}
       onMouseEnter={() => {
-        setHover(true);
+        setHover(!!solution);
       }}
       onMouseLeave={() => {
-        setHover(false);
+        setHover(!!solution);
       }}
     >
       <div className={`value ${value ? "show" : "hide"}`}>{hover ? solution : value}</div>
