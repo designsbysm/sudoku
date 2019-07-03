@@ -600,20 +600,32 @@ const possibleTriplets = cells => {
 
       if (triplets.length === 3) {
         removePossibleSearch(triplets, target);
+
       } else if (triplets.length === 2) {
         const twins = getTwins(set, triplets, target, 1);
 
-        removePossibleSearch([
+        if ([
           ...triplets,
           ...twins, 
-        ], target);
+        ].length === 3) {
+          removePossibleSearch([
+            ...triplets,
+            ...twins, 
+          ], target);
+        }
+        
       } else if (triplets.length === 1) {
         const twins = getTwins(set, triplets, target, 2);
 
-        removePossibleSearch([
+        if ([
           ...triplets,
           ...twins, 
-        ], target);
+        ].length === 3) {
+          removePossibleSearch([
+            ...triplets,
+            ...twins, 
+          ], target);
+        }
       }
     });
   };
