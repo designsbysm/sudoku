@@ -286,7 +286,11 @@ const isMoveValid = (cells, current, value) => {
     });
   });
 
-  return valid && cells[current.row - 1][current.column - 1].solution === value;
+  if (cells[current.row - 1][current.column - 1].solution) {
+    return valid && cells[current.row - 1][current.column - 1].solution === value;
+  } else {
+    return valid;
+  }
 };
 
 const isStillMoveValid = cells => {
