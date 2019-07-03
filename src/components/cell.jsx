@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
 //assets
 import "../styles/cell.scss";
 
 const Cell = ({ current, props, setCurrent }) => {
-  const { column, grid, notes, predefined, row, status, value } = props;
+  const [
+    hover,
+    setHover, 
+  ] = useState(false);
+
+  const { column, grid, notes, predefined, row, solution, status, value } = props;
 
   const getClasses = () => {
     const classes = [ "cell" ];
@@ -19,12 +24,15 @@ const Cell = ({ current, props, setCurrent }) => {
       classes.push(status);
     }
 
+    if (hover) {
+      classes.push("hover");
+    }
+
     return classes.join(" ");
   };
 
   return (
     <div
-      // className={`cell ${current.column === column && current.row === row ? "current" : ""}`}
       className={getClasses()}
       onClick={() => {
         if (predefined) {
@@ -37,8 +45,14 @@ const Cell = ({ current, props, setCurrent }) => {
           row,
         });
       }}
+      onMouseEnter={() => {
+        setHover(true);
+      }}
+      onMouseLeave={() => {
+        setHover(false);
+      }}
     >
-      <div className={`value ${value ? "show" : "hide"}`}>{value}</div>
+      <div className={`value ${value ? "show" : "hide"}`}>{hover ? solution : value}</div>
       <div className={`notes ${value ? "hide" : "show"}`}>
         <div className="item">{notes.includes(1) ? 1 : ""}</div>
         <div className="item">{notes.includes(2) ? 2 : ""}</div>

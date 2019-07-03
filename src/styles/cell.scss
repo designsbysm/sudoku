@@ -31,6 +31,17 @@
     }
   }
 
+  &.hover {
+    .notes {
+      display: none;
+    }
+
+    .value {
+      color: #f00;
+      display: block;
+    }
+  }
+
   // &:nth-child(odd) {
   //   background: rgba(#bec6d4, 0.2);
   // }
