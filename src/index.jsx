@@ -41,6 +41,9 @@ const initialCurrentCell = {
   row: -1,
 };
 
+const getCellsSubset = (set, exclude) =>
+  set.filter(cell => exclude.every(target => `${cell.row}${cell.column}` !== `${target.row}${target.column}`));
+
 const getGridID = (col, row) => {
   let grid = 1;
 
@@ -57,6 +60,92 @@ const getGridID = (col, row) => {
   }
 
   return grid;
+};
+
+const getPossibleSearchDigits = (set, min, max) => {
+  const count = {};
+
+  set.forEach(cell => {
+    cell.possible.forEach(value => {
+      count[value] = count[value] ? count[value] + 1 : 1;
+    });
+  });
+
+  const digits = [];
+
+  for (const key of Object.keys(count)) {
+    // console.log(key,count[key],min,max);
+    if (count[key] >= min && count[key] <= max) {
+      digits.push(parseInt(key, 10));
+    }
+  }
+
+  return digits;
+};
+
+const getPossibleSearchTriplets = digits => {
+  const values = [];
+
+  digits.forEach(digit1 => {
+    digits.forEach(digit2 => {
+      digits.forEach(digit3 => {
+        if (digit1 !== digit2 && digit1 !== digit3 && digit2 !== digit3) {
+          values.push([
+            digit1,
+            digit2,
+            digit3, 
+          ].sort());
+        }
+      });
+    });
+  });
+
+  const used = {};
+
+  const unique = values.filter(set => {
+    const key = set.join("");
+
+    if (!used[key]) {
+      used[key] = true;
+
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return unique;
+};
+
+const getPossibleSearchTwins = digits => {
+  const values = [];
+
+  digits.forEach(digit1 => {
+    digits.forEach(digit2 => {
+      if (digit1 !== digit2) {
+        values.push([
+          digit1,
+          digit2, 
+        ].sort());
+      }
+    });
+  });
+
+  const used = {};
+
+  const unique = values.filter(set => {
+    const key = set.join("");
+
+    if (!used[key]) {
+      used[key] = true;
+
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return unique;
 };
 
 const getPossibleValues = cells => {
@@ -269,17 +358,17 @@ const newGame = cells => {
   const update = [ ...cells ];
 
   /* eslint-disable array-element-newline */
-  // const solution = [
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  // ];
+  const solution = [
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+  ];
 
   // easy
   // const puzzle = [
@@ -321,41 +410,53 @@ const newGame = cells => {
   // ];
 
   // extreme
-  // const puzzle = [
-  //   [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
-  //   [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
-  //   [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
-  //   [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
-  //   [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
-  //   [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
-  //   [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
+  const puzzle = [
+    [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
+    [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
+    [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
+    [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
+    [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
+    [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
+    [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
+  ];
+
+  // const solution = [
+  //   [ 6, 2, 9, 7, 1, 8, 5, 4, 3 ],
+  //   [ 3, 7, 4, 5, 6, 2, 1, 9, 8 ],
+  //   [ 1, 5, 8, 4, 9, 3, 6, 2, 7 ],
+  //   [ 5, 8, 6, 3, 2, 1, 9, 7, 4 ],
+  //   [ 4, 3, 7, 9, 8, 5, 2, 6, 1 ],
+  //   [ 9, 1, 2, 6, 4, 7, 8, 3, 5 ],
+  //   [ 8, 6, 5, 2, 7, 4, 3, 1, 9 ],
+  //   [ 2, 4, 3, 1, 5, 9, 7, 8, 6 ],
+  //   [ 7, 9, 1, 8, 3, 6, 4, 5, 2 ],
   // ];
 
-  const solution = [
-    [ 6, 2, 9, 7, 1, 8, 5, 4, 3 ],
-    [ 3, 7, 4, 5, 6, 2, 1, 9, 8 ],
-    [ 1, 5, 8, 4, 9, 3, 6, 2, 7 ],
-    [ 5, 8, 6, 3, 2, 1, 9, 7, 4 ],
-    [ 4, 3, 7, 9, 8, 5, 2, 6, 1 ],
-    [ 9, 1, 2, 6, 4, 7, 8, 3, 5 ],
-    [ 8, 6, 5, 2, 7, 4, 3, 1, 9 ],
-    [ 2, 4, 3, 1, 5, 9, 7, 8, 6 ],
-    [ 7, 9, 1, 8, 3, 6, 4, 5, 2 ],
-  ];
+  // const puzzle = [
+  //   [ 0, 0, 9, 7, 0, 0, 0, 0, 3 ],
+  //   [ 0, 0, 4, 5, 0, 0, 0, 9, 0 ],
+  //   [ 1, 5, 0, 0, 9, 0, 0, 0, 0 ],
+  //   [ 0, 0, 0, 0, 0, 1, 0, 0, 0 ],
+  //   [ 0, 0, 0, 0, 8, 0, 0, 6, 1 ],
+  //   [ 0, 0, 2, 0, 0, 0, 8, 0, 0 ],
+  //   [ 0, 6, 0, 2, 0, 4, 0, 0, 0 ],
+  //   [ 0, 0, 0, 0, 0, 0, 7, 0, 0 ],
+  //   [ 7, 9, 0, 0, 0, 0, 0, 5, 0 ],
+  // ];
 
-  const puzzle = [
-    [ 0, 0, 9, 7, 0, 0, 0, 0, 3 ],
-    [ 0, 0, 4, 5, 0, 0, 0, 9, 0 ],
-    [ 1, 5, 0, 0, 9, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 1, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 8, 0, 0, 6, 1 ],
-    [ 0, 0, 2, 0, 0, 0, 8, 0, 0 ],
-    [ 0, 6, 0, 2, 0, 4, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 7, 0, 0 ],
-    [ 7, 9, 0, 0, 0, 0, 0, 5, 0 ],
-  ];
+  // const puzzle = [
+  //   [ 0, 0, 0, 3, 4, 0, 0, 0, 9 ],
+  //   [ 2, 0, 0, 0, 7, 0, 0, 0, 0 ],
+  //   [ 0, 8, 0, 0, 0, 6, 0, 4, 0 ],
+  //   [ 0, 9, 7, 0, 0, 0, 2, 0, 0 ],
+  //   [ 0, 0, 0, 0, 8, 0, 5, 0, 0 ],
+  //   [ 0, 0, 0, 7, 3, 0, 0, 0, 4 ],
+  //   [ 0, 4, 0, 0, 0, 1, 0, 8, 0 ],
+  //   [ 9, 6, 0, 0, 0, 0, 0, 0, 5 ],
+  //   [ 0, 0, 0, 0, 0, 0, 0, 3, 0 ],
+  // ];
   /* eslint-enable array-element-newline */
 
   for (let row = 1; row < 10; row++) {
@@ -456,81 +557,61 @@ const possibleSingles = cells => {
 };
 
 const possibleTriplets = cells => {
-  const countKeys = set => {
-    const possibles = set.map(cell => cell.possible.join(""));
-    const count = {};
+  const getTwins = (set, triplets, target, quanity) => {
+    const subset = getCellsSubset(set, triplets);
 
-    possibles.forEach(cell => {
-      if (cell.length === 2 || cell.length === 3) {
-        count[cell] = count[cell] ? count[cell] + 1 : 1;
+    const twins = getPossibleSearchTwins(target)
+      .map(values => {
+        return subset.filter(cell => cell.possible.includes(values[0]) && cell.possible.includes(values[1]));
+      })
+      .flat();
+
+    if (twins.length === quanity) {
+      if (
+        getCellsSubset(set, [
+          ...triplets,
+          ...twins, 
+        ])
+          .filter(cell => cell.possible.some(digit => target.includes(digit)))
+          .length === 0
+      ) {
+        return twins;
+      } else {
+        return [];
       }
-    });
-
-    return count;
+    } else {
+      return [];
+    }
   };
 
   const searchSet = set => {
-    const count = countKeys(set);
+    const digits = getPossibleSearchDigits(set, 2, 3);
+    const search = getPossibleSearchTriplets(digits);
 
-    // (3)3x triplets
-    for (const key of Object.keys(count)) {
-      if (count[key] === 3) {
-        set.forEach(cell => {
-          if (cell.possible.join("") !== key && cell.possible.length > 1) {
-            const values = [ ...key ].map(value => parseInt(value, 10));
+    search.forEach(target => {
+      const triplets = set.filter(
+        cell =>
+          cell.possible.includes(target[0]) && cell.possible.includes(target[1]) && cell.possible.includes(target[2]),
+      );
 
-            cell.possible = cell.possible.filter(value => !values.includes(value));
-          }
-        });
+      if (triplets.length === 3) {
+        removePossibleSearch(triplets, target);
+      } else if (triplets.length === 2) {
+        const twins = getTwins(set, triplets, target, 1);
+
+        removePossibleSearch([
+          ...triplets,
+          ...twins, 
+        ], target);
+      } else if (triplets.length === 1) {
+        const twins = getTwins(set, triplets, target, 2);
+
+        removePossibleSearch([
+          ...triplets,
+          ...twins, 
+        ], target);
       }
-    }
-
-    // (2)3x + (1)2x triplet
-    for (const threeKey of Object.keys(count)) {
-      if (threeKey.length === 3 && count[threeKey] === 2) {
-        for (const twoKey of Object.keys(count)) {
-          if (twoKey.length === 2 && count[twoKey] === 1) {
-            if ([ ...twoKey ].every(value => threeKey.includes(value))) {
-              set.forEach(cell => {
-                if (
-                  cell.possible.join("") !== twoKey &&
-                  cell.possible.join("") !== threeKey &&
-                  cell.possible.length > 1
-                ) {
-                  const values = [ ...threeKey ].map(value => parseInt(value, 10));
-
-                  cell.possible = cell.possible.filter(value => !values.includes(value));
-                }
-              });
-            }
-          }
-        }
-      }
-    }
-
-    // (1)3x + (2)2x  triplet
-    const found = [];
-    for (const threeKey of Object.keys(count)) {
-      if (threeKey.length === 3 && count[threeKey] === 1) {
-        for (const twoKey of Object.keys(count)) {
-          if (twoKey.length === 2 && count[twoKey] === 1) {
-            if ([ ...twoKey ].every(value => threeKey.includes(value))) {
-              found.push(threeKey);
-              found.push(twoKey);
-            }
-          }
-        }
-
-        if (found.length === 3) {
-          set.forEach(cell => {
-            if (found.every(value => cell.possible.join("") !== value) && cell.possible.length > 1) {
-              const values = [ ...threeKey ].map(value => parseInt(value, 10));
-              cell.possible = cell.possible.filter(value => !values.includes(value));
-            }
-          });
-        }
-      }
-    }
+    });
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -548,60 +629,14 @@ const possibleTriplets = cells => {
 
 const possibleTwins = cells => {
   const searchSet = set => {
-    const count = {};
+    const digits = getPossibleSearchDigits(set, 2, 2);
+    const search = getPossibleSearchTwins(digits);
 
-    set.forEach(cell => {
-      cell.possible.forEach(value => {
-        count[value] = count[value] ? count[value] + 1 : 1;
-      });
-    });
+    search.forEach(target => {
+      const twins = set.filter(cell => cell.possible.includes(target[0]) && cell.possible.includes(target[1]));
 
-    const digits = [];
-
-    for (const key of Object.keys(count)) {
-      if (count[key] === 2) {
-        digits.push(parseInt(key, 10));
-      }
-    }
-
-    const pairs = [];
-
-    if (digits.length > 1) {
-      digits.forEach(digit1 => {
-        digits.forEach(digit2 => {
-          pairs.push([
-            digit1,
-            digit2, 
-          ]);
-        });
-      });
-    }
-
-    const search = [];
-    const unique = pairs
-      .filter(pair => pair[0] !== pair[1])
-      .map(pair => pair.sort())
-      .filter(pair => {
-        const key = `${pair[0]}${pair[1]}`;
-
-        if (!search[key]) {
-          search[key] = true;
-
-          return true;
-        } else {
-          return false;
-        }
-      });
-
-    console.log(unique);
-
-    unique.forEach(pair => {
-      const found = set.filter(cell => cell.possible.includes(pair[0]) && cell.possible.includes(pair[1]));
-
-      if (found.length === 2) {
-        found.forEach(cell => {
-          cell.possible = cell.possible.filter(digit => pair.includes(digit));
-        });
+      if (twins.length === 2) {
+        removePossibleSearch(twins, target);
       }
     });
   };
@@ -617,6 +652,12 @@ const possibleTwins = cells => {
   });
 
   return possibleCreateUpdate(cells, rows);
+};
+
+const removePossibleSearch = (cells, target) => {
+  cells.forEach(cell => {
+    cell.possible = cell.possible.filter(digit => target.includes(digit));
+  });
 };
 
 const setupCells = () => {
