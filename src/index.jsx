@@ -131,8 +131,11 @@ const getPossibleValues = cells => {
 
     for (const fn of pipeline) {
       const key = fn.name.replace("possible", "");
+
+      // console.time(key);
       const result = fn(possibles);
       changes = hasChanges(possibles, result);
+      // console.timeEnd(key);
 
       if (changes) {
         scores[key] = scores[key] ? scores[key] + 1 : 1;
@@ -152,29 +155,13 @@ const getPossibleValues = cells => {
 };
 
 const getTargetDigits = (digits, length) => {
-  const noRepeatDigits = test => {
-    const count = {};
-    let repeats = false;
-
-    test.forEach(number => {
-      count[number] = count[number] ? count[number] + 1 : 1;
-    });
-
-    for (const key of Object.keys(count)) {
-      if (count[key] > 1) {
-        repeats = true;
-      }
-    }
-
-    return !repeats;
-  };
-
   const start = parseInt(
     Array(length)
       .fill(1)
       .join(""),
     10,
   );
+
   const end = parseInt(
     Array(length)
       .fill(9)
@@ -182,23 +169,24 @@ const getTargetDigits = (digits, length) => {
     10,
   );
 
-  const filtered = [];
+  const unique = new Set();
+  const stringDitgits = digits.map(number => number.toString());
 
-  for (let x = start; x < end; x++) {
-    const test = [ ...x.toString() ].sort();
+  for (let x = start + 1; x < end; x++) {
+    const test = [ ...x.toString() ];
 
-    if (test.every(number => digits.includes(parseInt(number, 10))) && noRepeatDigits(test)) {
-      filtered.push(test);
+    if (!/(.).*\1/.test(x) && test.every(number => stringDitgits.includes(number))) {
+      unique.add(test.sort()
+        .join(""));
     }
   }
 
-  const unique = [
-    ...new Set(filtered.map(test => test.join(""))
-      .sort()), 
-  ];
-
-  return unique.map(test => [ ...test ].map(number => parseInt(number, 10)));
+  return [ ...unique ].map(test => [ ...test ].map(number => parseInt(number, 10)));
 };
+
+/* eslint-disable array-element-newline */
+// console.info(getTargetDigits([ 1, 2, 3, 4, 5, 6, 7, 8, 9 ], 4));
+/* eslint-enable array-element-newline */
 
 const hintCellValue = (cells, current) => {
   const { column, row } = current;
