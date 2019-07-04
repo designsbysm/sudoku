@@ -62,7 +62,7 @@ const getGridID = (col, row) => {
   return grid;
 };
 
-const getNakedDigits = (set, length, quanity) => {
+const getNakedDigits = (set, length) => {
   const keys = set.filter(cell => cell.possible.length === length)
     .map(cell => cell.possible.join(""));
 
@@ -73,9 +73,7 @@ const getNakedDigits = (set, length, quanity) => {
 
   const targets = [];
   for (const key of Object.keys(count)) {
-    if (count[key] === quanity) {
-      targets.push([ ...key ].map(digit => parseInt(digit, 10)));
-    }
+    targets.push([ ...key ].map(digit => parseInt(digit, 10)));
   }
 
   return targets;
@@ -680,34 +678,7 @@ const possibleNakedSingles = cells => {
 
 const possibleNakedTriplets = cells => {
   const searchSet = set => {
-    let triplets = getNakedDigits(set, 3, 3);
-    if (triplets.length > 0) {
-      triplets.forEach(target => updateNakedPossibles(set, target));
-    }
-
-    triplets = getNakedDigits(set, 3, 2);
-    if (triplets.length > 0) {
-      triplets.forEach(triplet => {
-        const twins = getNakedDigits(set, 2, 1);
-        const valid = twins.filter(twin => twin.every(digit => triplet.includes(digit)));
-
-        if (valid.length === 1) {
-          updateNakedPossibles(set, triplet);
-        }
-      });
-    }
-
-    triplets = getNakedDigits(set, 3, 1);
-    if (triplets.length > 0) {
-      triplets.forEach(triplet => {
-        const twins = getNakedDigits(set, 2, 1);
-        const valid = twins.filter(twin => twin.every(digit => triplet.includes(digit)));
-
-        if (valid.length === 2) {
-          updateNakedPossibles(set, triplet);
-        }
-      });
-    }
+    updateNakedPossibles(set, 3);
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -725,8 +696,7 @@ const possibleNakedTriplets = cells => {
 
 const possibleNakedTwins = cells => {
   const searchSet = set => {
-    const targets = getNakedDigits(set, 2, 2);
-    targets.forEach(target => updateNakedPossibles(set, target));
+    updateNakedPossibles(set, 2);
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -843,12 +813,22 @@ const updateCellValue = (key, cells, current) => {
   return update;
 };
 
-const updateNakedPossibles = (set, target) => {
-  set
-    .filter(cell => cell.possible.some(digit => !target.includes(digit)))
-    .forEach(cell => {
-      cell.possible = cell.possible.filter(digit => !target.includes(digit));
-    });
+const updateNakedPossibles = (set, length) => {
+  const targets = getNakedDigits(set, length);
+
+  targets.forEach(target => {
+    const valid = set.filter(cell => cell.possible.every(digit => target.includes(digit)));
+
+    if (valid.length === length) {
+      set
+        .filter(cell => cell.possible.some(digit => !target.includes(digit)))
+        .forEach(cell => {
+          cell.possible = cell.possible.filter(digit => !target.includes(digit));
+        });
+
+      console.log(target, set);
+    }
+  });
 };
 
 const App = () => {
