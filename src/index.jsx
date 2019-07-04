@@ -159,22 +159,14 @@ const getPossibleValues = cells => {
     return r.map(cell => {
       const { column, grid, row, value } = cell;
 
+      /* eslint-disable array-element-newline */
       return {
         column,
         grid,
-        possible: value ? [ value ] : [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9, 
-        ],
+        possible: value ? [ value ] : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
         row,
       };
+      /* eslint-enable array-element-newline */
     });
   });
 
@@ -239,17 +231,9 @@ const isGameComplete = cells => {
   let valid = true;
 
   cells.forEach(r => {
-    let test = [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9, 
-    ];
+    /* eslint-disable array-element-newline */
+    let test = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+    /* eslint-enable array-element-newline */
 
     r.forEach(cell => {
       test = test.filter(value => value !== cell.value);
