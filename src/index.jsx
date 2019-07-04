@@ -62,20 +62,6 @@ const getGridID = (col, row) => {
   return grid;
 };
 
-const getNakedDigits = (set, length) => {
-  const digits = getPossibleSearchDigits(set, 1, 9);
-
-  if (length === 2) {
-    return getPossibleSearchTwins(digits);
-  } else if (length === 3) {
-    return getPossibleSearchTriplets(digits);
-  } else if (length === 4) {
-    return getPossibleSearchQuads(digits);
-  } else {
-    return [];
-  }
-};
-
 const getPossibleSearchDigits = (set, min, max) => {
   const count = {};
 
@@ -98,115 +84,6 @@ const getPossibleSearchDigits = (set, min, max) => {
   }
 
   return digits;
-};
-
-const getPossibleSearchQuads = digits => {
-  const values = [];
-
-  digits.forEach(digit1 => {
-    digits.forEach(digit2 => {
-      digits.forEach(digit3 => {
-        digits.forEach(digit4 => {
-          if (
-            digit1 !== digit2 &&
-            digit1 !== digit3 &&
-            digit1 !== digit4 &&
-            digit2 !== digit3 &&
-            digit2 !== digit4 &&
-            digit3 !== digit4
-          ) {
-            values.push([
-              digit1,
-              digit2,
-              digit3,
-              digit4, 
-            ].sort());
-          }
-        });
-      });
-    });
-  });
-
-  const used = {};
-
-  const unique = values.filter(set => {
-    const key = set.join("");
-
-    if (!used[key]) {
-      used[key] = true;
-
-      return true;
-    } else {
-      return false;
-    }
-  });
-
-  return unique;
-};
-
-const getPossibleSearchTriplets = digits => {
-  const values = [];
-
-  digits.forEach(digit1 => {
-    digits.forEach(digit2 => {
-      digits.forEach(digit3 => {
-        if (digit1 !== digit2 && digit1 !== digit3 && digit2 !== digit3) {
-          values.push([
-            digit1,
-            digit2,
-            digit3, 
-          ].sort());
-        }
-      });
-    });
-  });
-
-  const used = {};
-
-  const unique = values.filter(set => {
-    const key = set.join("");
-
-    if (!used[key]) {
-      used[key] = true;
-
-      return true;
-    } else {
-      return false;
-    }
-  });
-
-  return unique;
-};
-
-const getPossibleSearchTwins = digits => {
-  const values = [];
-
-  digits.forEach(digit1 => {
-    digits.forEach(digit2 => {
-      if (digit1 !== digit2) {
-        values.push([
-          digit1,
-          digit2, 
-        ].sort());
-      }
-    });
-  });
-
-  const used = {};
-
-  const unique = values.filter(set => {
-    const key = set.join("");
-
-    if (!used[key]) {
-      used[key] = true;
-
-      return true;
-    } else {
-      return false;
-    }
-  });
-
-  return unique;
 };
 
 const getPossibleValues = cells => {
@@ -272,6 +149,55 @@ const getPossibleValues = cells => {
   console.table(scores);
 
   return possibles;
+};
+
+const getTargetDigits = (digits, length) => {
+  const noRepeatDigits = test => {
+    const count = {};
+    let repeats = false;
+
+    test.forEach(number => {
+      count[number] = count[number] ? count[number] + 1 : 1;
+    });
+
+    for (const key of Object.keys(count)) {
+      if (count[key] > 1) {
+        repeats = true;
+      }
+    }
+
+    return !repeats;
+  };
+
+  const start = parseInt(
+    Array(length)
+      .fill(1)
+      .join(""),
+    10,
+  );
+  const end = parseInt(
+    Array(length)
+      .fill(9)
+      .join(""),
+    10,
+  );
+
+  const filtered = [];
+
+  for (let x = start; x < end; x++) {
+    const test = [ ...x.toString() ].sort();
+
+    if (test.every(number => digits.includes(parseInt(number, 10))) && noRepeatDigits(test)) {
+      filtered.push(test);
+    }
+  }
+
+  const unique = [
+    ...new Set(filtered.map(test => test.join(""))
+      .sort()), 
+  ];
+
+  return unique.map(test => [ ...test ].map(number => parseInt(number, 10)));
 };
 
 const hintCellValue = (cells, current) => {
@@ -440,67 +366,43 @@ const newGame = (cells, load) => {
   ];
 
   // medium
-  // const puzzle = [
-  //   [ 7, 6, 0, 1, 3, 0, 4, 5, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-  //   [ 1, 0, 0, 9, 0, 0, 0, 2, 0 ],
-  //   [ 2, 0, 5, 0, 0, 7, 0, 0, 0 ],
-  //   [ 0, 4, 0, 8, 6, 9, 0, 7, 0 ],
-  //   [ 0, 0, 0, 5, 0, 0, 1, 0, 9 ],
-  //   [ 0, 1, 0, 0, 0, 4, 0, 0, 5 ],
-  //   [ 9, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 7, 3, 0, 9, 5, 0, 6, 1 ],
-  // ];
+  puzzle = [
+    [ 7, 6, 0, 1, 3, 0, 4, 5, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
+    [ 1, 0, 0, 9, 0, 0, 0, 2, 0 ],
+    [ 2, 0, 5, 0, 0, 7, 0, 0, 0 ],
+    [ 0, 4, 0, 8, 6, 9, 0, 7, 0 ],
+    [ 0, 0, 0, 5, 0, 0, 1, 0, 9 ],
+    [ 0, 1, 0, 0, 0, 4, 0, 0, 5 ],
+    [ 9, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 7, 3, 0, 9, 5, 0, 6, 1 ],
+  ];
 
   // difficult
-  // const puzzle = [
-  //   [ 0, 0, 0, 0, 6, 0, 0, 2, 0 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 0, 7 ],
-  //   [ 0, 0, 0, 1, 0, 4, 0, 0, 9 ],
-  //   [ 0, 0, 4, 0, 0, 0, 9, 0, 5 ],
-  //   [ 0, 5, 2, 0, 0, 6, 0, 7, 0 ],
-  //   [ 9, 0, 7, 0, 0, 0, 6, 0, 0 ],
-  //   [ 7, 0, 0, 6, 0, 3, 0, 0, 0 ],
-  //   [ 6, 3, 0, 0, 0, 0, 0, 0, 0 ],
-  //   [ 0, 9, 0, 0, 1, 0, 0, 0, 0 ],
-  // ];
+  puzzle = [
+    [ 0, 0, 0, 3, 7, 0, 0, 1, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 5, 0, 4 ],
+    [ 9, 0, 0, 4, 5, 0, 8, 0, 0 ],
+    [ 2, 0, 0, 0, 8, 0, 0, 0, 3 ],
+    [ 0, 0, 4, 1, 6, 3, 2, 0, 0 ],
+    [ 5, 0, 0, 0, 2, 0, 0, 0, 8 ],
+    [ 0, 0, 8, 0, 9, 5, 0, 0, 7 ],
+    [ 7, 0, 9, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 3, 0, 0, 4, 2, 0, 0, 0 ],
+  ];
 
   // extreme
-  // const puzzle = [
-  //   [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
-  //   [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
-  //   [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
-  //   [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
-  //   [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
-  //   [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
-  //   [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
-  //   [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
-  //   [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
-  // ];
-
-  // const puzzle = [
-  //   [ 0, 0, 0, 3, 4, 0, 0, 0, 9 ],
-  //   [ 2, 0, 0, 0, 7, 0, 0, 0, 0 ],
-  //   [ 0, 8, 0, 0, 0, 6, 0, 4, 0 ],
-  //   [ 0, 9, 7, 0, 0, 0, 2, 0, 0 ],
-  //   [ 0, 0, 0, 0, 8, 0, 5, 0, 0 ],
-  //   [ 0, 0, 0, 7, 3, 0, 0, 0, 4 ],
-  //   [ 0, 4, 0, 0, 0, 1, 0, 8, 0 ],
-  //   [ 9, 6, 0, 0, 0, 0, 0, 0, 5 ],
-  //   [ 0, 0, 0, 0, 0, 0, 0, 3, 0 ],
-  // ];
-
-  // const puzzle = [
-  //   [ 0, 0, 0, 0, 0, 1, 0, 3, 0 ],
-  //   [ 2, 3, 1, 0, 9, 0, 0, 0, 0 ],
-  //   [ 0, 6, 5, 0, 0, 3, 1, 0, 0 ],
-  //   [ 6, 7, 8, 9, 2, 4, 3, 0, 0 ],
-  //   [ 1, 0, 3, 0, 5, 0, 0, 0, 6 ],
-  //   [ 0, 0, 0, 1, 3, 6, 7, 0, 0 ],
-  //   [ 0, 0, 9, 3, 6, 0, 5, 7, 0 ],
-  //   [ 0, 0, 6, 0, 1, 9, 8, 4, 3 ],
-  //   [ 3, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  // ];
+  puzzle = [
+    [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
+    [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
+    [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
+    [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
+    [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
+    [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
+    [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
+    [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
+    [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
+  ];
   /* eslint-enable array-element-newline */
 
   if (load) {
@@ -589,7 +491,7 @@ const possibleHiddenTriplets = cells => {
   const getTwins = (set, triplets, target, quanity) => {
     const subset = getCellsSubset(set, triplets);
 
-    const twins = getPossibleSearchTwins(target)
+    const twins = getTargetDigits(target, 2)
       .map(values => {
         return subset.filter(cell => cell.possible.includes(values[0]) && cell.possible.includes(values[1]));
       })
@@ -615,7 +517,7 @@ const possibleHiddenTriplets = cells => {
 
   const searchSet = set => {
     const digits = getPossibleSearchDigits(set, 2, 3);
-    const search = getPossibleSearchTriplets(digits);
+    const search = getTargetDigits(digits, 2);
 
     search.forEach(target => {
       const triplets = set.filter(
@@ -669,7 +571,7 @@ const possibleHiddenTriplets = cells => {
 const possibleHiddenTwins = cells => {
   const searchSet = set => {
     const digits = getPossibleSearchDigits(set, 2, 2);
-    const search = getPossibleSearchTwins(digits);
+    const search = getTargetDigits(digits, 2);
 
     search.forEach(target => {
       const twins = set.filter(cell => cell.possible.includes(target[0]) && cell.possible.includes(target[1]));
@@ -881,7 +783,8 @@ const updateCellValue = (key, cells, current) => {
 };
 
 const updateNakedPossibles = (set, length) => {
-  const targets = getNakedDigits(set, length);
+  const digits = getPossibleSearchDigits(set, 1, 9);
+  const targets = getTargetDigits(digits, length);
 
   targets.forEach(target => {
     const valid = set.filter(cell => cell.possible.every(digit => target.includes(digit)));
