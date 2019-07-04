@@ -174,9 +174,9 @@ const getPossibleValues = cells => {
 
   const pipeline = [
     possibleCRME,
-    possibleSingles,
-    possibleTwins,
-    possibleTriplets, 
+    possibleHiddenSingles,
+    possibleNakedTwins,
+    possibleNakedTriplets,
   ];
 
   const scores = {};
@@ -519,7 +519,7 @@ const possibleCRME = cells => {
   return poccessPossibleCells(cells, searchSet);
 };
 
-const possibleSingles = cells => {
+const possibleHiddenSingles = cells => {
   const searchSet = set => {
     const count = {};
 
@@ -543,7 +543,7 @@ const possibleSingles = cells => {
   return poccessPossibleCells(cells, searchSet);
 };
 
-const possibleTriplets = cells => {
+const possibleHiddenTriplets = cells => {
   const getTwins = (set, triplets, target, quanity) => {
     const subset = getCellsSubset(set, triplets);
 
@@ -583,7 +583,6 @@ const possibleTriplets = cells => {
 
       if (triplets.length === 3) {
         removePossibleSearch(triplets, target);
-
       } else if (triplets.length === 2) {
         const twins = getTwins(set, triplets, target, 1);
 
@@ -596,7 +595,6 @@ const possibleTriplets = cells => {
             ...twins, 
           ], target);
         }
-        
       } else if (triplets.length === 1) {
         const twins = getTwins(set, triplets, target, 2);
 
@@ -616,7 +614,7 @@ const possibleTriplets = cells => {
   return poccessPossibleCells(cells, searchSet);
 };
 
-const possibleTwins = cells => {
+const possibleHiddenTwins = cells => {
   const searchSet = set => {
     const digits = getPossibleSearchDigits(set, 2, 2);
     const search = getPossibleSearchTwins(digits);
