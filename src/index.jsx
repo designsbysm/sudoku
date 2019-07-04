@@ -192,7 +192,7 @@ const getPossibleValues = cells => {
   let continueSearch = true;
 
   const pipeline = [
-    possibleCRME,
+    possibleNakedSingles,
     possibleHiddenSingles,
     possibleNakedTwins,
     possibleNakedTriplets,
@@ -504,38 +504,6 @@ const possibleCreateUpdate = (cells, possibles) => {
   return updates;
 };
 
-const possibleCRME = cells => {
-  const searchSet = set => {
-    const usedValues = [];
-
-    set.forEach(cell => {
-      if (cell.possible.length === 1) {
-        usedValues.push(...cell.possible);
-      }
-    });
-
-    usedValues.forEach(used => {
-      set.forEach(cell => {
-        if (cell.possible.length > 1) {
-          cell.possible = cell.possible.filter(value => value !== used);
-        }
-      });
-    });
-  };
-
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
-};
-
 const possibleHiddenSingles = cells => {
   const searchSet = set => {
     const count = {};
@@ -662,6 +630,38 @@ const possibleHiddenTwins = cells => {
       if (twins.length === 2) {
         removePossibleSearch(twins, target);
       }
+    });
+  };
+
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    searchSet(set);
+  });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
+const possibleNakedSingles = cells => {
+  const searchSet = set => {
+    const usedValues = [];
+
+    set.forEach(cell => {
+      if (cell.possible.length === 1) {
+        usedValues.push(...cell.possible);
+      }
+    });
+
+    usedValues.forEach(used => {
+      set.forEach(cell => {
+        if (cell.possible.length > 1) {
+          cell.possible = cell.possible.filter(value => value !== used);
+        }
+      });
     });
   };
 
