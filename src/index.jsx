@@ -63,26 +63,27 @@ const getGridID = (col, row) => {
 };
 
 const getNakedDigits = (set, length) => {
-  const keys = set.filter(cell => cell.possible.length === length)
-    .map(cell => cell.possible.join(""));
+  const digits = getPossibleSearchDigits(set, 1, 9);
 
-  const count = {};
-  keys.forEach(key => {
-    count[key] = count[key] ? count[key] + 1 : 1;
-  });
-
-  const targets = [];
-  for (const key of Object.keys(count)) {
-    targets.push([ ...key ].map(digit => parseInt(digit, 10)));
+  if (length === 2) {
+    return getPossibleSearchTwins(digits);
+  } else if (length === 3) {
+    return getPossibleSearchTriplets(digits);
+  } else if (length === 4) {
+    return getPossibleSearchQuads(digits);
+  } else {
+    return [];
   }
-
-  return targets;
 };
 
 const getPossibleSearchDigits = (set, min, max) => {
   const count = {};
 
   set.forEach(cell => {
+    if (cell.possible.length === 1) {
+      return;
+    }
+
     cell.possible.forEach(value => {
       count[value] = count[value] ? count[value] + 1 : 1;
     });
@@ -91,13 +92,56 @@ const getPossibleSearchDigits = (set, min, max) => {
   const digits = [];
 
   for (const key of Object.keys(count)) {
-    // console.log(key,count[key],min,max);
     if (count[key] >= min && count[key] <= max) {
       digits.push(parseInt(key, 10));
     }
   }
 
   return digits;
+};
+
+const getPossibleSearchQuads = digits => {
+  const values = [];
+
+  digits.forEach(digit1 => {
+    digits.forEach(digit2 => {
+      digits.forEach(digit3 => {
+        digits.forEach(digit4 => {
+          if (
+            digit1 !== digit2 &&
+            digit1 !== digit3 &&
+            digit1 !== digit4 &&
+            digit2 !== digit3 &&
+            digit2 !== digit4 &&
+            digit3 !== digit4
+          ) {
+            values.push([
+              digit1,
+              digit2,
+              digit3,
+              digit4, 
+            ].sort());
+          }
+        });
+      });
+    });
+  });
+
+  const used = {};
+
+  const unique = values.filter(set => {
+    const key = set.join("");
+
+    if (!used[key]) {
+      used[key] = true;
+
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return unique;
 };
 
 const getPossibleSearchTriplets = digits => {
@@ -193,9 +237,14 @@ const getPossibleValues = cells => {
     possibleNakedSingles,
     possibleHiddenSingles,
     possibleNakedTwins,
-    possibleNakedTriplets,
     possibleHiddenTwins,
+    possibleNakedTriplets,
     possibleHiddenTriplets,
+    possibleNakedQuads,
+    // TODO: possibleHiddenQuads
+    // TODO: pointing line
+    // TODO: box/line
+    // TODO: x-wing
   ];
 
   const scores = {};
@@ -676,6 +725,24 @@ const possibleNakedSingles = cells => {
   return possibleCreateUpdate(cells, rows);
 };
 
+const possibleNakedQuads = cells => {
+  const searchSet = set => {
+    updateNakedPossibles(set, 4);
+  };
+
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    searchSet(set);
+  });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
 const possibleNakedTriplets = cells => {
   const searchSet = set => {
     updateNakedPossibles(set, 3);
@@ -826,7 +893,7 @@ const updateNakedPossibles = (set, length) => {
           cell.possible = cell.possible.filter(digit => !target.includes(digit));
         });
 
-      console.log(target, set);
+      // console.log(target, set);
     }
   });
 };
