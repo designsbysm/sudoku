@@ -177,6 +177,7 @@ const getPossibleValues = cells => {
     possibleHiddenSingles,
     possibleNakedTwins,
     possibleNakedTriplets,
+    possibleHiddenTwins,
   ];
 
   const scores = {};
@@ -656,6 +657,40 @@ const possibleHiddenTwins = cells => {
 
   return possibleCreateUpdate(cells, rows);
 };
+
+const possibleNakedTwins = cells => {
+  const searchSet = set => {
+    const keys = set.filter(cell => cell.possible.length === 2)
+      .map(cell => cell.possible.join(""));
+
+    const count = {};
+    keys.forEach(key => {
+      count[key] = count[key] ? count[key] + 1 : 1;
+    });
+
+    for (const key of Object.keys(count)) {
+      if (count[key] === 2) {
+        const target = [ ...key ].map(digit => parseInt(digit, 10));
+        const subset = set
+          .filter(cell => cell.possible.join("") !== key)
+          .forEach(cell => {
+            cell.possible = cell.possible.filter(digit => !target.includes(digit));
+          });
+      }
+    }
+  };
+
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    searchSet(set);
+  });
+
+  return possibleCreateUpdate(cells, rows);
 };
 
 const removePossibleSearch = (cells, target) => {
