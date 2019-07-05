@@ -184,10 +184,6 @@ const getTargetDigits = (digits, length) => {
   return [ ...unique ].map(test => [ ...test ].map(number => parseInt(number, 10)));
 };
 
-/* eslint-disable array-element-newline */
-// console.info(getTargetDigits([ 1, 2, 3, 4, 5, 6, 7, 8, 9 ], 4));
-/* eslint-enable array-element-newline */
-
 const hintCellValue = (cells, current) => {
   const { column, row } = current;
   if (column === -1 && row === -1) {
