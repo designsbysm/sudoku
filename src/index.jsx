@@ -35,6 +35,18 @@ const applyPossibleValues = (cells, possibles) => {
   return update;
 };
 
+const countPossibles = cells => {
+  const count = {};
+
+  cells.forEach(cell => {
+    cell.possible.forEach(value => {
+      count[value] = count[value] ? count[value] + 1 : 1;
+    });
+  });
+
+  return count;
+};
+
 const initialCurrentCell = {
   column: -1,
   grid: -1,
@@ -60,23 +72,14 @@ const getGridID = (col, row) => {
 };
 
 const getPossibleSearchDigits = (set, min, max) => {
-  const count = {};
-
-  set.forEach(cell => {
-    if (cell.possible.length === 1) {
-      return;
-    }
-
-    cell.possible.forEach(value => {
-      count[value] = count[value] ? count[value] + 1 : 1;
-    });
-  });
-
+  const count = countPossibles(set);
   const digits = [];
 
   for (const key of Object.keys(count)) {
-    if (count[key] >= min && count[key] <= max) {
-      digits.push(parseInt(key, 10));
+    if (count[key] > 1) {
+      if (count[key] >= min && count[key] <= max) {
+        digits.push(parseInt(key, 10));
+      }
     }
   }
 
@@ -442,13 +445,7 @@ const possibleCreateUpdate = (cells, possibles) => {
 
 const possibleHiddenSingles = cells => {
   const searchSet = set => {
-    const count = {};
-
-    set.forEach(cell => {
-      cell.possible.forEach(value => {
-        count[value] = count[value] ? count[value] + 1 : 1;
-      });
-    });
+    const count = countPossibles(set);
 
     for (const key of Object.keys(count)) {
       if (count[key] === 1) {
