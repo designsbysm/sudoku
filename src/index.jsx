@@ -475,72 +475,27 @@ const possibleHiddenSingles = cells => {
   return possibleCreateUpdate(cells, rows);
 };
 
-const possibleHiddenTriplets = cells => {
-  const getTwins = (set, triplets, target, quanity) => {
-    const subset = getCellsSubset(set, triplets);
-
-    const twins = getTargetDigits(target, 2)
-      .map(values => {
-        return subset.filter(cell => cell.possible.includes(values[0]) && cell.possible.includes(values[1]));
-      })
-      .flat();
-
-    if (twins.length === quanity) {
-      if (
-        getCellsSubset(set, [
-          ...triplets,
-          ...twins, 
-        ])
-          .filter(cell => cell.possible.some(digit => target.includes(digit)))
-          .length === 0
-      ) {
-        return twins;
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
+const possibleHiddenQuads = cells => {
+  const searchSet = set => {
+    updateHiddenPossibles(set, 4);
   };
 
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    searchSet(set);
+  });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
+const possibleHiddenTriplets = cells => {
   const searchSet = set => {
-    const digits = getPossibleSearchDigits(set, 2, 3);
-    const search = getTargetDigits(digits, 2);
-
-    search.forEach(target => {
-      const triplets = set.filter(
-        cell =>
-          cell.possible.includes(target[0]) && cell.possible.includes(target[1]) && cell.possible.includes(target[2]),
-      );
-
-      if (triplets.length === 3) {
-        removePossibleSearch(triplets, target);
-      } else if (triplets.length === 2) {
-        const twins = getTwins(set, triplets, target, 1);
-
-        if ([
-          ...triplets,
-          ...twins, 
-        ].length === 3) {
-          removePossibleSearch([
-            ...triplets,
-            ...twins, 
-          ], target);
-        }
-      } else if (triplets.length === 1) {
-        const twins = getTwins(set, triplets, target, 2);
-
-        if ([
-          ...triplets,
-          ...twins, 
-        ].length === 3) {
-          removePossibleSearch([
-            ...triplets,
-            ...twins, 
-          ], target);
-        }
-      }
-    });
+    updateHiddenPossibles(set, 3);
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -558,16 +513,7 @@ const possibleHiddenTriplets = cells => {
 
 const possibleHiddenTwins = cells => {
   const searchSet = set => {
-    const digits = getPossibleSearchDigits(set, 2, 2);
-    const search = getTargetDigits(digits, 2);
-
-    search.forEach(target => {
-      const twins = set.filter(cell => cell.possible.includes(target[0]) && cell.possible.includes(target[1]));
-
-      if (twins.length === 2) {
-        removePossibleSearch(twins, target);
-      }
-    });
+    updateHiddenPossibles(set, 2);
   };
 
   const { columns, grids, rows } = splitCRM(cells);
@@ -768,6 +714,23 @@ const updateCellValue = (key, cells, current) => {
   update[row - 1][column - 1].value = newValue;
 
   return update;
+};
+
+const updateHiddenPossibles = (set, length) => {
+  const digits = getPossibleSearchDigits(set, 1, length);
+  const targets = getTargetDigits(digits, length);
+
+  targets.forEach(target => {
+    const valid = set.filter(cell => cell.possible.some(digit => target.includes(digit)));
+
+    if (valid.length === length) {
+      valid.forEach(cell => {
+        cell.possible = cell.possible.filter(digit => target.includes(digit));
+      });
+
+      // console.log(target, set);
+    }
+  });
 };
 
 const updateNakedPossibles = (set, length) => {
