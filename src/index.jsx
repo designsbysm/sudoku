@@ -439,6 +439,20 @@ const possibleCreateUpdate = (cells, possibles) => {
   return updates;
 };
 
+const poccessCellPossibleFN = (cells, fn, ...args) => {
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    fn(set, ...args);
+  });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
 const possibleHiddenSingles = cells => {
   const searchSet = set => {
     const count = countPossibles(set);
@@ -454,71 +468,19 @@ const possibleHiddenSingles = cells => {
     }
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, searchSet);
 };
 
 const possibleHiddenQuads = cells => {
-  const searchSet = set => {
-    updateHiddenPossibles(set, 4);
-  };
-
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, updateHiddenPossibles, 4);
 };
 
 const possibleHiddenTriplets = cells => {
-  const searchSet = set => {
-    updateHiddenPossibles(set, 3);
-  };
-
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, updateHiddenPossibles, 3);
 };
 
 const possibleHiddenTwins = cells => {
-  const searchSet = set => {
-    updateHiddenPossibles(set, 2);
-  };
-
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, updateHiddenPossibles, 2);
 };
 
 const possibleNakedSingles = cells => {
@@ -540,58 +502,20 @@ const possibleNakedSingles = cells => {
     });
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, searchSet);
 };
 
 const possibleNakedQuads = cells => {
-  const searchSet = set => {
-    updateNakedPossibles(set, 4);
-  };
-
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, updateNakedPossibles, 4);
 };
 
 const possibleNakedTriplets = cells => {
-  const searchSet = set => {
-    updateNakedPossibles(set, 3);
-  };
-
-  const { columns, grids, rows } = splitCRM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
-  });
-
-  return possibleCreateUpdate(cells, rows);
+  return poccessCellPossibleFN(cells, updateNakedPossibles, 3);
 };
 
 const possibleNakedTwins = cells => {
-  const searchSet = set => {
-    updateNakedPossibles(set, 2);
+  return poccessCellPossibleFN(cells, updateNakedPossibles, 2);
+};
   };
 
   const { columns, grids, rows } = splitCRM(cells);
