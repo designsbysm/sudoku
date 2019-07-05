@@ -41,9 +41,6 @@ const initialCurrentCell = {
   row: -1,
 };
 
-const getCellsSubset = (set, exclude) =>
-  set.filter(cell => exclude.every(target => `${cell.row}${cell.column}` !== `${target.row}${target.column}`));
-
 const getGridID = (col, row) => {
   let grid = 1;
 
@@ -118,7 +115,7 @@ const getPossibleValues = cells => {
     possibleNakedTriplets,
     possibleHiddenTriplets,
     possibleNakedQuads,
-    // TODO: possibleHiddenQuads
+    possibleHiddenQuads,
     // TODO: pointing line
     // TODO: box/line
     // TODO: x-wing
@@ -615,12 +612,6 @@ const possibleNakedTwins = cells => {
   });
 
   return possibleCreateUpdate(cells, rows);
-};
-
-const removePossibleSearch = (cells, target) => {
-  cells.forEach(cell => {
-    cell.possible = cell.possible.filter(digit => target.includes(digit));
-  });
 };
 
 const setupCells = () => {
