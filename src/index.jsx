@@ -119,8 +119,8 @@ const getPossibleValues = cells => {
     possibleHiddenTriplets,
     possibleNakedQuads,
     possibleHiddenQuads,
-    // TODO: pointing line
     // TODO: box/line
+    possiblePointingPairs,
     // TODO: x-wing
   ];
 
@@ -516,16 +516,58 @@ const possibleNakedTriplets = cells => {
 const possibleNakedTwins = cells => {
   return poccessCellPossibleFN(cells, updateNakedPossibles, 2);
 };
+
+const possiblePointingPairs = cells => {
+  const searchSet = (set, rows, columns) => {
+    const digits = getPossibleSearchDigits(set, 2, 3);
+
+    const pointing = digits.map(digit => {
+      const subset = set.filter(cell => cell.possible.includes(digit));
+
+      if (subset.every(cell => cell.row === subset[0].row)) {
+        return {
+          digit,
+          grid: set[0].grid,
+          id: subset[0].row,
+          set: "row",
+        };
+      } else if (subset.every(cell => cell.column === subset[0].column)) {
+        return {
+          digit,
+          grid: set[0].grid,
+          id: subset[0].column,
+          set: "column",
+        };
+      } else {
+        return null;
+      }
+    });
+
+    pointing.forEach(found => {
+      if (!found) {
+        return;
+      }
+
+      let search = [];
+
+      if (found.set === "row") {
+        search = rows[found.id - 1];
+      } else if (found.set === "column") {
+        search = columns[found.id - 1];
+      }
+
+      search
+        .filter(cell => cell.grid !== found.grid)
+        .forEach(cell => {
+          cell.possible = cell.possible.filter(digit => digit !== found.digit);
+        });
+    });
   };
 
   const { columns, grids, rows } = splitCRM(cells);
 
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    searchSet(set);
+  [ ...grids ].forEach(set => {
+    searchSet(set, rows, columns);
   });
 
   return possibleCreateUpdate(cells, rows);
