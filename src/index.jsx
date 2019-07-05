@@ -254,6 +254,8 @@ const isMoveValid = (cells, current, value) => {
 
   if (cells[current.row - 1][current.column - 1].solution) {
     return valid && cells[current.row - 1][current.column - 1].solution === value;
+    // } else if (cells[current.row - 1][current.column - 1].notes.length === 1) {
+    // return valid && cells[current.row - 1][current.column - 1].notes[0] === value;
   } else {
     return valid;
   }
