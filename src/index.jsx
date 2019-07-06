@@ -119,8 +119,8 @@ const getPossibleValues = cells => {
     possibleHiddenTriplets,
     possibleNakedQuads,
     possibleHiddenQuads,
-    // TODO: box/line
     possiblePointingPairs,
+    possibleClaimingPairs,
     // TODO: x-wing
   ];
 
@@ -422,6 +422,63 @@ const newGame = (cells, load) => {
   return update;
 };
 
+const possibleClaimingPairs = cells => {
+  const searchSet = (set, grids) => {
+    const digits = getPossibleSearchDigits(set, 2, 3);
+
+    const result = digits.map(digit => {
+      const subset = set.filter(cell => cell.possible.includes(digit));
+
+      if (subset.every(cell => cell.grid === subset[0].grid)) {
+        let id = null;
+        let direction = null;
+
+        if (set.every(cell => cell.row === set[0].row)) {
+          id = set[0].row;
+          direction = "row";
+        } else if (set.every(cell => cell.column === set[0].column)) {
+          id = set[0].column;
+          direction = "column";
+        }
+
+        return {
+          digit,
+          grid: subset[0].grid,
+          id,
+          set: direction,
+        };
+      } else {
+        return null;
+      }
+    });
+
+    result.forEach(found => {
+      if (!found) {
+        return;
+      }
+
+      const search = grids[found.grid - 1];
+
+      search
+        .filter(cell => cell[found.set] !== found.id)
+        .forEach(cell => {
+          cell.possible = cell.possible.filter(digit => digit !== found.digit);
+        });
+    });
+  };
+
+  const { columns, grids, rows } = splitCRM(cells);
+
+  [
+    ...rows,
+    ...columns, 
+  ].forEach(set => {
+    searchSet(set, grids);
+  });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
 const possibleCreateUpdate = (cells, possibles) => {
   const updates = cells.map(r => {
     return r.map(cell => {
@@ -521,7 +578,7 @@ const possiblePointingPairs = cells => {
   const searchSet = (set, rows, columns) => {
     const digits = getPossibleSearchDigits(set, 2, 3);
 
-    const pointing = digits.map(digit => {
+    const result = digits.map(digit => {
       const subset = set.filter(cell => cell.possible.includes(digit));
 
       if (subset.every(cell => cell.row === subset[0].row)) {
@@ -543,7 +600,7 @@ const possiblePointingPairs = cells => {
       }
     });
 
-    pointing.forEach(found => {
+    result.forEach(found => {
       if (!found) {
         return;
       }
