@@ -121,7 +121,7 @@ const getPossibleValues = cells => {
     possibleHiddenQuads,
     possiblePointingPairs,
     possibleClaimingPairs,
-    // TODO: x-wing
+    possibleXWing,
   ];
 
   const scores = {};
@@ -626,6 +626,106 @@ const possiblePointingPairs = cells => {
   [ ...grids ].forEach(set => {
     searchSet(set, rows, columns);
   });
+
+  return possibleCreateUpdate(cells, rows);
+};
+
+const possibleXWing = cells => {
+  const searchSet = (set, update) => {
+    const found = set
+      .map(unit => {
+        const digits = getPossibleSearchDigits(unit, 2, 2);
+
+        return digits.map(digit => {
+          const search = {
+            id: [],
+            type: null,
+          };
+
+          const exclude = {
+            id: null,
+            type: null,
+          };
+
+          if (
+            unit.every(cell => {
+              return cell.row === unit[0].row;
+            })
+          ) {
+            search.type = "column";
+            exclude.type = "row";
+          } else {
+            search.type = "row";
+            exclude.type = "column";
+          }
+
+          const subset = unit.filter(cell => cell.possible.includes(digit));
+
+          search.id = [
+            subset[0][search.type],
+            subset[1][search.type], 
+          ];
+          exclude.id = subset[0][exclude.type];
+
+          return {
+            digit,
+            exclude,
+            key: `${digit}${exclude.type}${subset.map(cell => cell[search.type])
+              .join("")}`,
+            search,
+          };
+        });
+      })
+      .flat();
+
+    const condensed = {};
+    found.forEach(result => {
+      const { key } = result;
+
+      if (!condensed[key]) {
+        condensed[key] = [];
+      }
+      condensed[key].push(result);
+    });
+
+    const xwings = [];
+    for (const key of Object.keys(condensed)) {
+      if (condensed[key].length === 2) {
+        xwings.push(
+          condensed[key].reduce((current, accum) => {
+            if (!current) {
+              return accum;
+            }
+
+            const combined = {
+              ...current,
+            };
+            combined.exclude.id = [
+              current.exclude.id,
+              accum.exclude.id, 
+            ];
+
+            return combined;
+          }, null),
+        );
+      }
+    }
+
+    xwings.forEach(xwing => {
+      update
+        .filter((cell, index) => xwing.search.id.includes(index + 1))
+        .map(units => units.filter(cell => !xwing.exclude.id.includes(cell[xwing.exclude.type])))
+        .flat()
+        .forEach(cell => {
+          cell.possible = cell.possible.filter(digit => digit !== xwing.digit);
+        });
+    });
+  };
+
+  const { columns, rows } = splitCRM(cells);
+
+  searchSet(rows, columns);
+  searchSet(columns, rows);
 
   return possibleCreateUpdate(cells, rows);
 };
