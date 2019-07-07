@@ -7,7 +7,7 @@ import Grid from "./components/grid";
 //assets
 import "./styles/index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEraser, faLightbulb, faPenFancy, faPencil, faPlus } from "@fortawesome/pro-light-svg-icons";
+import { faEraser, faLightbulb, faPenFancy, faPencil, faUndo } from "@fortawesome/pro-light-svg-icons";
 
 const allowCellUpdate = (cells, current) => {
   const { column, row } = current;
@@ -797,14 +797,16 @@ const updateCellNotes = (key, cells, current) => {
   const { column, row } = current;
   const newValue = parseInt(key, 10);
 
-  const update = [ ...cells ];
+  const update = getCleanCopyOfCells(cells);
   let notes = update[row - 1][column - 1].notes;
 
   if (notes.includes(newValue)) {
     notes = notes.filter(item => item !== newValue);
-    // console.log(notes.filter(item => item !== newValue));
   } else if (!notes.includes(newValue)) {
-    notes.push(newValue);
+    notes = [
+      ...notes,
+      newValue, 
+    ];
   }
 
   update[row - 1][column - 1].notes = notes;
@@ -909,6 +911,11 @@ const App = () => {
         setPenMode(!penMode);
         break;
 
+      case "u":
+      case "U":
+        undoMove();
+        break;
+
       default:
     }
   };
@@ -959,7 +966,26 @@ const App = () => {
     if (!update) {
       return;
     }
+    setMoveHistory(previous => {
+      return [
+        ...previous,
+        getCleanCopyOfCells(cells), 
+      ];
+    });
     setCells(update);
+  };
+
+  const undoMove = () => {
+    if (moveHistory.length === 0) {
+      console.log("no more moves");
+      return;
+    }
+
+    const moves = [ ...moveHistory ];
+    const last = moves.pop();
+
+    setCells(last);
+    setMoveHistory(moves);
   };
 
   const [
@@ -981,6 +1007,11 @@ const App = () => {
     mounted,
     setMounted, 
   ] = useState(false);
+
+  const [
+    moveHistory,
+    setMoveHistory, 
+  ] = useState([]);
 
   const [
     penMode,
@@ -1062,9 +1093,9 @@ const App = () => {
             <FontAwesomeIcon icon={faLightbulb} size="2x" />
             Hint
           </div>
-          <div onClick={() => startGame(importPuzzle)} className="button">
-            <FontAwesomeIcon icon={faPlus} size="2x" />
-            New Game
+          <div onClick={() => undoMove()} className="button">
+            <FontAwesomeIcon icon={faUndo} size="2x" />
+            Undo
           </div>
         </div>
       </aside>
