@@ -102,18 +102,16 @@ const getPossibleValues = (cells, pipeline) => {
 
   let possibles = cells.map(r => {
     return r.map(cell => {
-      const { column, grid, notes, row, value } = cell;
+      const { column, grid, row, value } = cell;
 
       /* eslint-disable array-element-newline */
-      const possible = notes.length > 0 ? notes : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
-      /* eslint-enable array-element-newline */
-
       return {
         column,
         grid,
-        possible: value ? [ value ] : possible,
+        possible: value ? [ value ] : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
         row,
       };
+      /* eslint-enable array-element-newline */
     });
   });
 
