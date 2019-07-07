@@ -1,15 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
 //assets
 import "../styles/cell.scss";
 
 const Cell = ({ current, props, setCurrent }) => {
-  const [
-    hover,
-    setHover, 
-  ] = useState(false);
-
-  const { column, grid, notes, predefined, row, solution, status, value } = props;
+  const { column, grid, notes, predefined, row, status, value } = props;
 
   const getClasses = () => {
     const classes = [ "cell" ];
@@ -22,10 +17,6 @@ const Cell = ({ current, props, setCurrent }) => {
       classes.push("predefined");
     } else if (status) {
       classes.push(status);
-    }
-
-    if (hover) {
-      classes.push("hover");
     }
 
     return classes.join(" ");
@@ -45,14 +36,8 @@ const Cell = ({ current, props, setCurrent }) => {
           row,
         });
       }}
-      onMouseEnter={() => {
-        setHover(!!solution && !predefined);
-      }}
-      onMouseLeave={() => {
-        setHover(false);
-      }}
     >
-      <div className={`value ${value ? "show" : "hide"}`}>{hover ? solution : value}</div>
+      <div className={`value ${value ? "show" : "hide"}`}>{value}</div>
       <div className={`notes ${value ? "hide" : "show"}`}>
         <div className="item">{notes.includes(1) ? 1 : ""}</div>
         <div className="item">{notes.includes(2) ? 2 : ""}</div>
