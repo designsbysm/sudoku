@@ -53,6 +53,13 @@ const initialCurrentCell = {
   row: -1,
 };
 
+const getCleanCopyOfCells = cells =>
+  cells.map(unit =>
+    unit.map(cell => {
+      return { ...cell };
+    }),
+  );
+
 const getGridID = (col, row) => {
   let grid = 1;
 
@@ -86,7 +93,7 @@ const getPossibleSearchDigits = (set, min, max) => {
   return digits;
 };
 
-const getPossibleValues = cells => {
+const getPossibleValues = (cells, pipeline) => {
   const hashPossibles = grid => grid.map(r => r.map(cell => cell.possible.join(""))
     .join(""))
     .join("");
@@ -95,35 +102,22 @@ const getPossibleValues = cells => {
 
   let possibles = cells.map(r => {
     return r.map(cell => {
-      const { column, grid, row, value } = cell;
+      const { column, grid, notes, row, value } = cell;
 
       /* eslint-disable array-element-newline */
+      const possible = notes.length > 0 ? notes : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+      /* eslint-enable array-element-newline */
+
       return {
         column,
         grid,
-        possible: value ? [ value ] : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        possible: value ? [ value ] : possible,
         row,
       };
-      /* eslint-enable array-element-newline */
     });
   });
 
   let continueSearch = true;
-
-  const pipeline = [
-    possibleNakedSingles,
-    possibleHiddenSingles,
-    possibleNakedTwins,
-    possibleHiddenTwins,
-    possibleNakedTriplets,
-    possibleHiddenTriplets,
-    possibleNakedQuads,
-    possibleHiddenQuads,
-    possiblePointingPairs,
-    possibleClaimingPairs,
-    possibleXWing,
-  ];
-
   const scores = {};
 
   while (continueSearch) {
@@ -206,23 +200,11 @@ const isGameComplete = cells => {
     return false;
   }
 
-  let valid = true;
-
-  cells.forEach(r => {
-    /* eslint-disable array-element-newline */
-    let test = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
-    /* eslint-enable array-element-newline */
-
-    r.forEach(cell => {
-      test = test.filter(value => value !== cell.value);
-    });
-
-    if (test.length > 0) {
-      valid = false;
-    }
+  const solution = cells.map(r => {
+    return r.map(cell => cell.value || 0);
   });
 
-  return valid;
+  return isSolutionValid(solution);
 };
 
 const isMoveValid = (cells, current, value) => {
@@ -257,12 +239,12 @@ const isMoveValid = (cells, current, value) => {
   }
 };
 
-const isStillMoveValid = cells => {
+const isMoveStillValid = cells => {
   if (!cells) {
     return null;
   }
 
-  const update = [ ...cells ];
+  const update = getCleanCopyOfCells(cells);
 
   update.forEach(r => {
     r.forEach(cell => {
@@ -275,6 +257,43 @@ const isStillMoveValid = cells => {
   });
 
   return update;
+};
+
+const isSolutionValid = values => {
+  if (!values) {
+    return false;
+  }
+
+  const rows = values;
+  /* eslint-disable array-element-newline */
+  const columns = [ [], [], [], [], [], [], [], [], [] ];
+  /* eslint-enable array-element-newline */
+
+  values.forEach(row => {
+    row.forEach((cell, index) => {
+      columns[index].push(cell);
+    });
+  });
+
+  let valid = true;
+  [
+    ...rows,
+    ...columns, 
+  ].forEach(r => {
+    /* eslint-disable array-element-newline */
+    let test = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+    /* eslint-enable array-element-newline */
+
+    r.forEach(cell => {
+      test = test.filter(value => value !== cell);
+    });
+
+    if (test.length > 0) {
+      valid = false;
+    }
+  });
+
+  return valid;
 };
 
 const moveCurrent = (key, col, row) => {
@@ -322,81 +341,18 @@ const moveCurrent = (key, col, row) => {
   };
 };
 
-const newGame = (cells, load) => {
-  const update = [ ...cells ];
+const newGame = importGrid => {
+  const cells = setupCells();
 
-  /* eslint-disable array-element-newline */
-  const solution = [
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-  ];
+  let solution = [];
+  let puzzle = [];
 
-  // easy
-  let puzzle = [
-    [ 0, 0, 5, 4, 0, 0, 1, 8, 0 ],
-    [ 1, 4, 6, 0, 8, 0, 5, 0, 0 ],
-    [ 0, 7, 0, 0, 1, 3, 0, 0, 0 ],
-    [ 4, 5, 1, 0, 0, 8, 7, 0, 6 ],
-    [ 0, 8, 0, 0, 0, 0, 0, 1, 0 ],
-    [ 6, 0, 3, 7, 0, 0, 9, 4, 8 ],
-    [ 0, 0, 0, 3, 9, 0, 0, 7, 0 ],
-    [ 0, 0, 4, 0, 7, 0, 2, 6, 9 ],
-    [ 0, 1, 9, 0, 0, 6, 4, 0, 0 ],
-  ];
-
-  // medium
-  puzzle = [
-    [ 7, 6, 0, 1, 3, 0, 4, 5, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 0, 0, 3 ],
-    [ 1, 0, 0, 9, 0, 0, 0, 2, 0 ],
-    [ 2, 0, 5, 0, 0, 7, 0, 0, 0 ],
-    [ 0, 4, 0, 8, 6, 9, 0, 7, 0 ],
-    [ 0, 0, 0, 5, 0, 0, 1, 0, 9 ],
-    [ 0, 1, 0, 0, 0, 4, 0, 0, 5 ],
-    [ 9, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 7, 3, 0, 9, 5, 0, 6, 1 ],
-  ];
-
-  // difficult
-  puzzle = [
-    [ 0, 0, 0, 3, 7, 0, 0, 1, 0 ],
-    [ 0, 0, 0, 0, 0, 0, 5, 0, 4 ],
-    [ 9, 0, 0, 4, 5, 0, 8, 0, 0 ],
-    [ 2, 0, 0, 0, 8, 0, 0, 0, 3 ],
-    [ 0, 0, 4, 1, 6, 3, 2, 0, 0 ],
-    [ 5, 0, 0, 0, 2, 0, 0, 0, 8 ],
-    [ 0, 0, 8, 0, 9, 5, 0, 0, 7 ],
-    [ 7, 0, 9, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 3, 0, 0, 4, 2, 0, 0, 0 ],
-  ];
-
-  // extreme
-  puzzle = [
-    [ 0, 0, 0, 0, 3, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 6, 0, 7, 0, 0, 9 ],
-    [ 0, 0, 0, 9, 0, 0, 7, 3, 0 ],
-    [ 0, 0, 0, 0, 0, 6, 0, 0, 4 ],
-    [ 1, 8, 0, 4, 0, 5, 0, 2, 7 ],
-    [ 7, 0, 0, 3, 0, 0, 0, 0, 0 ],
-    [ 0, 7, 1, 0, 0, 9, 0, 0, 0 ],
-    [ 2, 0, 0, 1, 0, 8, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 7, 0, 0, 0, 0 ],
-  ];
-  /* eslint-enable array-element-newline */
-
-  if (load) {
+  if (importGrid) {
     let index = 1;
     let row = [];
     puzzle = [];
 
-    [ ...load ].forEach(digit => {
+    [ ...importGrid ].forEach(digit => {
       row.push(parseInt(digit, 10));
 
       index++;
@@ -406,20 +362,45 @@ const newGame = (cells, load) => {
         index = 1;
       }
     });
+  } else {
+    console.log("generate puzzle");
   }
 
   for (let row = 1; row < 10; row++) {
     for (let column = 1; column < 10; column++) {
       if (puzzle[row - 1][column - 1]) {
-        update[row - 1][column - 1].predefined = true;
-        update[row - 1][column - 1].value = puzzle[row - 1][column - 1];
+        cells[row - 1][column - 1].predefined = true;
+        cells[row - 1][column - 1].value = puzzle[row - 1][column - 1];
       }
-
-      update[row - 1][column - 1].solution = solution[row - 1][column - 1];
     }
   }
 
-  return update;
+  if (solution.length === 0) {
+    const possibles = getPossibleValues(cells, possiblePipeline);
+    solution = possibles.map(row => {
+      return row.map(cell => {
+        if (cell.possible.length > 1) {
+          return 0;
+        }
+
+        return cell.possible[0];
+      });
+    });
+  }
+
+  if (!isSolutionValid(solution)) {
+    // TODO: warn user
+    console.error("no solution found", solution);
+  } else {
+    // add solution to cells
+    for (let row = 1; row < 10; row++) {
+      for (let column = 1; column < 10; column++) {
+        cells[row - 1][column - 1].solution = solution[row - 1][column - 1];
+      }
+    }
+  }
+
+  return cells;
 };
 
 const possibleClaimingPairs = cells => {
@@ -467,7 +448,7 @@ const possibleClaimingPairs = cells => {
     });
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
+  const { columns, grids, rows } = splitRCM(cells);
 
   [
     ...rows,
@@ -497,7 +478,7 @@ const possibleCreateUpdate = (cells, possibles) => {
 };
 
 const poccessCellPossibleFN = (cells, fn, ...args) => {
-  const { columns, grids, rows } = splitCRM(cells);
+  const { columns, grids, rows } = splitRCM(cells);
 
   [
     ...rows,
@@ -621,7 +602,7 @@ const possiblePointingPairs = cells => {
     });
   };
 
-  const { columns, grids, rows } = splitCRM(cells);
+  const { columns, grids, rows } = splitRCM(cells);
 
   [ ...grids ].forEach(set => {
     searchSet(set, rows, columns);
@@ -722,12 +703,40 @@ const possibleXWing = cells => {
     });
   };
 
-  const { columns, rows } = splitCRM(cells);
+  const { columns, rows } = splitRCM(cells);
 
   searchSet(rows, columns);
   searchSet(columns, rows);
 
   return possibleCreateUpdate(cells, rows);
+};
+
+const possiblePipeline = [
+  possibleNakedSingles,
+  possibleHiddenSingles,
+  possibleNakedTwins,
+  possibleHiddenTwins,
+  possibleNakedTriplets,
+  possibleHiddenTriplets,
+  possibleNakedQuads,
+  possibleHiddenQuads,
+  possiblePointingPairs,
+  possibleClaimingPairs,
+  possibleXWing,
+];
+
+const removeRCMNote = (key, cells, current) => {
+  const digit = parseInt(key, 10);
+  const update = getCleanCopyOfCells(cells);
+
+  update.forEach(r => {
+    r.forEach(cell => {
+      if (cell.column === current.column || cell.grid === current.grid || cell.row === current.row)
+        cell.notes = cell.notes.filter(value => value !== digit);
+    });
+  });
+
+  return update;
 };
 
 const setupCells = () => {
@@ -756,7 +765,7 @@ const setupCells = () => {
   return cells;
 };
 
-const splitCRM = cells => {
+const splitRCM = cells => {
   /* eslint-disable array-element-newline */
   const rows = [ [], [], [], [], [], [], [], [], [] ];
 
@@ -817,7 +826,7 @@ const updateCellValue = (key, cells, current) => {
     newValue = 0;
   }
 
-  const update = [ ...cells ];
+  const update = getCleanCopyOfCells(cells);
   update[row - 1][column - 1].notes = [];
   update[row - 1][column - 1].status = isMoveValid(cells, current, newValue) ? "" : "error";
   update[row - 1][column - 1].value = newValue;
@@ -918,9 +927,8 @@ const App = () => {
   };
 
   const startGame = puzzle => {
-    const game = newGame(setupCells(), puzzle);
-
-    const possibles = getPossibleValues(game);
+    const game = newGame(puzzle);
+    const possibles = getPossibleValues(game, [ possibleNakedSingles ]);
     const updated = applyPossibleValues(game, possibles);
 
     setCells(updated);
@@ -931,12 +939,21 @@ const App = () => {
 
     if (penMode) {
       update = updateCellValue(key, cells, current);
+      update = removeRCMNote(key, update, current);
+      update = isMoveStillValid(update);
 
-      const possibles = getPossibleValues(update);
-      update = applyPossibleValues(update, possibles);
+      const possibles = getPossibleValues(update, possiblePipeline);
+      const solution = possibles.map(row => {
+        return row.map(cell => {
+          if (cell.possible.length > 1) {
+            return 0;
+          }
 
-      update = isStillMoveValid(update);
-      console.log(isGameComplete(update));
+          return cell.possible[0];
+        });
+      });
+
+      console.log("complete:", isGameComplete(update), "solution:", isSolutionValid(solution));
     } else {
       update = updateCellNotes(key, cells, current);
     }
@@ -951,6 +968,11 @@ const App = () => {
     cells,
     setCells, 
   ] = useState([]);
+
+  const [
+    importPuzzle,
+    setImportPuzzle, 
+  ] = useState("");
 
   const [
     current,
@@ -977,13 +999,19 @@ const App = () => {
 
   useEffect(() => {
     if (!mounted) {
-      let query = "";
+      let puzzle = "";
 
       if (window.location.search && window.location.search.startsWith("?")) {
-        query = window.location.search.replace("?", "");
+        puzzle = window.location.search.replace("?", "");
+
+        if (puzzle.length !== 81) {
+          return;
+        }
+
+        setImportPuzzle(puzzle);
       }
 
-      startGame(query);
+      startGame(puzzle);
       setMounted(true);
     }
   }, [ mounted ]);
@@ -1036,7 +1064,7 @@ const App = () => {
             <FontAwesomeIcon icon={faLightbulb} size="2x" />
             Hint
           </div>
-          <div onClick={() => startGame()} className="button">
+          <div onClick={() => startGame(importPuzzle)} className="button">
             <FontAwesomeIcon icon={faPlus} size="2x" />
             New Game
           </div>
