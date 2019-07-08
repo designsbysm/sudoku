@@ -193,6 +193,11 @@ const hintCellValue = (cells, current) => {
   return update;
 };
 
+const initialGameOptions = {
+  hasSolution: false,
+  isComplete: false,
+};
+
 const isGameComplete = cells => {
   if (!cells) {
     return false;
@@ -959,6 +964,14 @@ const App = () => {
       });
 
       console.log("complete:", isGameComplete(update), "solution:", isSolutionValid(solution));
+
+      setGameOptions(previous => {
+        return {
+          ...previous,
+          hasSolution: isSolutionValid(solution),
+          isComplete: isGameComplete(update),
+        };
+      });
     } else {
       update = updateCellNotes(key, cells, current);
     }
@@ -987,6 +1000,11 @@ const App = () => {
     setCells(last);
     setMoveHistory(moves);
   };
+
+  const [
+    gameOptions,
+    setGameOptions, 
+  ] = useState(initialGameOptions);
 
   const [
     cells,
@@ -1048,7 +1066,7 @@ const App = () => {
   return (
     <section className="content">
       <main>
-        <Grid cells={cells} current={current} setCurrent={setCurrent} />
+        <Grid cells={cells} current={current} gameOtions={gameOptions} setCurrent={setCurrent} />
       </main>
       <aside onClick={() => resetCurrent()}>
         <div className="number-pad">

@@ -4,6 +4,7 @@
   cursor: pointer;
   display: grid;
   padding: 0.1em;
+  transition: background 0.3s ease-in-out;
 
   .notes {
     display: grid;
@@ -46,20 +47,29 @@
   //   background: rgba(#bec6d4, 0.2);
   // }
 
-  &.predefined {
-    background: rgba(#bec6d4, 0.6);
+  .success & {
+    background: rgba(#0f0, 0.6);
+
+    &.current {
+      background: rgba(#0f0, 0.6);
+    }
   }
 
   &.current {
     background: rgba(#bec6d4, 0.4);
   }
 
+  .error &,
   &.error {
     background: rgba(#f00, 0.6);
+
+    &.current {
+      background: rgba(#f00, 0.8);
+    }
   }
 
-  &.success {
-    background: rgba(#0f0, 0.6);
+  &.predefined {
+    background: rgba(#bec6d4, 0.6);
   }
 
   &:nth-child(3n) {
