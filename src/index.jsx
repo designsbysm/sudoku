@@ -47,12 +47,6 @@ const countPossibles = cells => {
   return count;
 };
 
-const initialCurrentCell = {
-  column: -1,
-  grid: -1,
-  row: -1,
-};
-
 const getCleanCopyOfCells = cells =>
   cells.map(unit =>
     unit.map(cell => {
@@ -193,9 +187,18 @@ const hintCellValue = (cells, current) => {
   return update;
 };
 
+const initialCurrentCell = {
+  column: -1,
+  grid: -1,
+  row: -1,
+};
+
 const initialGameOptions = {
-  hasSolution: false,
+  hasSolution: true,
   isComplete: false,
+  mounted: false,
+  penMode: true,
+  puzzle: "",
 };
 
 const isGameComplete = cells => {
@@ -884,11 +887,11 @@ const App = () => {
       case "ArrowLeft":
       case "ArrowRight":
       case "ArrowUp":
-        const { column, row } = current;
+        const { column, row } = currentCell;
         const newPosition = moveCurrent(key, column, row);
 
         if (newPosition) {
-          setCurrent(newPosition);
+          setCurrentCell(newPosition);
         }
 
         break;
@@ -908,12 +911,14 @@ const App = () => {
 
       case "h":
       case "H":
-        hintCell(cells, current);
+        hintCell(cells, currentCell);
         break;
 
       case "n":
       case "N":
-        setPenMode(!penMode);
+        updateGameOptions({
+          penMode: !gameOptions.penMode,
+        });
         break;
 
       case "u":
@@ -926,30 +931,30 @@ const App = () => {
   };
 
   const hintCell = () => {
-    const update = hintCellValue(cells, current);
+    const update = hintCellValue(cells, currentCell);
     console.log(isGameComplete(update));
 
     setCells(update);
   };
 
   const resetCurrent = () => {
-    setCurrent(initialCurrentCell);
+    setCurrentCell(initialCurrentCell);
   };
 
   const startGame = puzzle => {
     const game = newGame(puzzle);
-    const possibles = getPossibleValues(game, [ possibleNakedSingles ]);
-    const updated = applyPossibleValues(game, possibles);
+    // const possibles = getPossibleValues(game, [ possibleNakedSingles ]);
+    // const updated = applyPossibleValues(game, possibles);
 
-    setCells(updated);
+    setCells(game);
   };
 
   const updateCell = key => {
     let update = null;
 
-    if (penMode) {
-      update = updateCellValue(key, cells, current);
-      update = removeRCMNote(key, update, current);
+    if (gameOptions.penMode) {
+      update = updateCellValue(key, cells, currentCell);
+      update = removeRCMNote(key, update, currentCell);
       update = isMoveStillValid(update);
 
       const possibles = getPossibleValues(update, possiblePipeline);
@@ -963,22 +968,20 @@ const App = () => {
         });
       });
 
-      console.log("complete:", isGameComplete(update), "solution:", isSolutionValid(solution));
+      // console.log("complete:", isGameComplete(update), "solution:", isSolutionValid(solution));
 
-      setGameOptions(previous => {
-        return {
-          ...previous,
-          hasSolution: isSolutionValid(solution),
-          isComplete: isGameComplete(update),
-        };
+      updateGameOptions({
+        hasSolution: isSolutionValid(solution),
+        isComplete: isGameComplete(update),
       });
     } else {
-      update = updateCellNotes(key, cells, current);
+      update = updateCellNotes(key, cells, currentCell);
     }
 
     if (!update) {
       return;
     }
+
     setMoveHistory(previous => {
       return [
         ...previous,
@@ -986,6 +989,15 @@ const App = () => {
       ];
     });
     setCells(update);
+  };
+
+  const updateGameOptions = setting => {
+    setGameOptions(previous => {
+      return {
+        ...previous,
+        ...setting,
+      };
+    });
   };
 
   const undoMove = () => {
@@ -1012,29 +1024,14 @@ const App = () => {
   ] = useState([]);
 
   const [
-    importPuzzle,
-    setImportPuzzle, 
-  ] = useState("");
-
-  const [
-    current,
-    setCurrent, 
+    currentCell,
+    setCurrentCell, 
   ] = useState(initialCurrentCell);
-
-  const [
-    mounted,
-    setMounted, 
-  ] = useState(false);
 
   const [
     moveHistory,
     setMoveHistory, 
   ] = useState([]);
-
-  const [
-    penMode,
-    setPenMode, 
-  ] = useState(true);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeydown);
@@ -1045,7 +1042,7 @@ const App = () => {
   });
 
   useEffect(() => {
-    if (!mounted) {
+    if (!gameOptions.mounted) {
       let puzzle = "";
 
       if (window.location.search && window.location.search.startsWith("?")) {
@@ -1055,18 +1052,22 @@ const App = () => {
           return;
         }
 
-        setImportPuzzle(puzzle);
+        updateGameOptions({
+          puzzle,
+        });
       }
 
       startGame(puzzle);
-      setMounted(true);
+      updateGameOptions({
+        mounted: true,
+      });
     }
-  }, [ mounted ]);
+  });
 
   return (
     <section className="content">
       <main>
-        <Grid cells={cells} current={current} gameOtions={gameOptions} setCurrent={setCurrent} />
+        <Grid cells={cells} current={currentCell} gameOtions={gameOptions} setCurrent={setCurrentCell} />
       </main>
       <aside onClick={() => resetCurrent()}>
         <div className="number-pad">
@@ -1099,15 +1100,22 @@ const App = () => {
           </div>
         </div>
         <div className="commands">
-          <div onClick={() => setPenMode(!penMode)} className="button">
-            <FontAwesomeIcon icon={penMode ? faPenFancy : faPencil} size="2x" />
-            {penMode ? "Pen" : "Pencil"}
+          <div
+            onClick={() =>
+              updateGameOptions({
+                penMode: !gameOptions.penMode,
+              })
+            }
+            className="button"
+          >
+            <FontAwesomeIcon icon={gameOptions.penMode ? faPenFancy : faPencil} size="2x" />
+            {gameOptions.penMode ? "Pen" : "Pencil"}
           </div>
           <div onClick={() => updateCell(0)} className="button">
             <FontAwesomeIcon icon={faEraser} size="2x" />
             Delete
           </div>
-          <div onClick={() => hintCell(cells, current)} className="button">
+          <div onClick={() => hintCell(cells, currentCell)} className="button">
             <FontAwesomeIcon icon={faLightbulb} size="2x" />
             Hint
           </div>
