@@ -988,7 +988,11 @@ const App = () => {
   };
 
   const hintCell = () => {
-    const update = hintCellValue(cells, currentCell);
+    let update = hintCellValue(cells, currentCell);
+
+    const possibles = getPossibleValues(update, possiblePipeline);
+    update = applyPossibleValues(update, possibles);
+
     console.log(isGameComplete(update));
 
     setCells(update);
