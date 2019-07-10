@@ -24,7 +24,7 @@ const allowCellUpdate = (cells, current) => {
 };
 
 const applyPossibleValues = (cells, possibles) => {
-  const update = [ ...cells ];
+  const update = getCleanCopyOfCells(cells);
 
   for (let row = 1; row < 10; row++) {
     for (let column = 1; column < 10; column++) {
@@ -139,6 +139,17 @@ const getPossibleValues = (cells, pipeline) => {
 
   return possibles;
 };
+
+const getSolutionFromPossibles = cells =>
+  cells.map(row => {
+    return row.map(cell => {
+      if (cell.possible.length > 1) {
+        return 0;
+      }
+
+      return cell.possible[0];
+    });
+  });
 
 const getTargetDigits = (digits, length) => {
   const start = parseInt(
@@ -407,6 +418,51 @@ const newGame = importGrid => {
   }
 
   return cells;
+};
+
+const possibleBruteForce = (cells, depth = 0) => {
+  let solutionFound = false;
+  let update = getCleanCopyOfCells(cells);
+  const currentDepth = depth;
+  const leastPossibles = getCellsByLeastPossibles(update);
+
+  if (leastPossibles.length > 1) {
+    for (let index = 0; index < leastPossibles.length; index++) {
+      const cell = leastPossibles[index];
+
+      for (let digit = 0; digit < cell.possible.length; digit++) {
+        update[cell.row - 1][cell.column - 1].possible = [ cell.possible[digit] ];
+        const removeSingles = possibleNakedSingles(update);
+        const result = possibleBruteForce(removeSingles, currentDepth + 1);
+
+        if (result) {
+          solutionFound = true;
+          update = result;
+
+          break;
+        }
+      }
+
+      if (solutionFound) {
+        break;
+      }
+    }
+  } else if (currentDepth > 0) {
+    const solution = getSolutionFromPossibles(update);
+
+    if (isSolutionValid(solution)) {
+      return update;
+    } else {
+      return null;
+    }
+  }
+
+  const solution = getSolutionFromPossibles(update);
+  if (!update || (!isSolutionValid(solution) && currentDepth === 0)) {
+    return cells;
+  }
+
+  return update;
 };
 
 const possibleClaimingPairs = cells => {
@@ -729,6 +785,7 @@ const possiblePipeline = [
   possiblePointingPairs,
   possibleClaimingPairs,
   possibleXWing,
+  possibleBruteForce,
 ];
 
 const removeRCMNote = (key, cells, current) => {
