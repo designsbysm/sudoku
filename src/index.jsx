@@ -1011,6 +1011,14 @@ const App = () => {
   };
 
   const updateCell = key => {
+    if (
+      currentCell.row === -1 ||
+      currentCell.column === -1 ||
+      cells[currentCell.row - 1][currentCell.column - 1].predefined
+    ) {
+      return;
+    }
+
     let update = null;
 
     if (gameOptions.penMode) {
