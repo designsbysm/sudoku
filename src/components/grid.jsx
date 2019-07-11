@@ -18,8 +18,8 @@ const Grid = ({ cells, current, gameOtions, setCurrent }) => {
 
     if (gameOtions.isComplete) {
       classes.push("success");
-    } else if (!gameOtions.hasSolution) {
-      classes.push("error");
+      // } else if (!gameOtions.hasSolution) {
+      //   classes.push("error");
     }
 
     return classes.join(" ");
