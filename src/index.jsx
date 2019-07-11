@@ -9,6 +9,26 @@ import "./styles/index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faLightbulb, faPenFancy, faPencil, faUndo } from "@fortawesome/pro-light-svg-icons";
 
+const shuffleArray = original => {
+  const shuffled = [ ...original ];
+  let counter = original.length;
+  let temp;
+  let index;
+
+  while (counter > 0) {
+    // pick a random element
+    index = Math.floor(Math.random() * counter);
+    counter--;
+
+    // and swap the last element with it
+    temp = shuffled[counter];
+    shuffled[counter] = shuffled[index];
+    shuffled[index] = temp;
+  }
+
+  return shuffled;
+};
+
 const allowCellUpdate = (cells, current) => {
   const { column, row } = current;
   if (column === -1 && row === -1) {
@@ -45,6 +65,28 @@ const countPossibles = cells => {
   });
 
   return count;
+};
+
+const getCellsByLeastPossibles = possibles => {
+  const byCount = {};
+  const sorted = [];
+
+  possibles
+    .flat()
+    .filter(cell => cell.possible.length > 1)
+    .forEach(cell => {
+      if (!byCount[cell.possible.length]) {
+        byCount[cell.possible.length] = [];
+      }
+
+      byCount[cell.possible.length].push(cell);
+    });
+
+  for (const key of Object.keys(byCount)) {
+    sorted.push(...byCount[key]);
+  }
+
+  return sorted;
 };
 
 const getCleanCopyOfCells = cells =>
@@ -471,15 +513,23 @@ const possibleBruteForce = (cells, depth = 0) => {
   let solutionFound = false;
   let update = getCleanCopyOfCells(cells);
   const currentDepth = depth;
-  const leastPossibles = getCellsByLeastPossibles(update);
+  const leastPossibles = getCellsByLeastPossibles(cells);
 
   if (leastPossibles.length > 1) {
     for (let index = 0; index < leastPossibles.length; index++) {
       const cell = leastPossibles[index];
+      const possibleDigits = shuffleArray(cell.possible);
 
-      for (let digit = 0; digit < cell.possible.length; digit++) {
-        update[cell.row - 1][cell.column - 1].possible = [ cell.possible[digit] ];
+      for (let digit = 0; digit < possibleDigits.length; digit++) {
+        update[cell.row - 1][cell.column - 1].possible = [ possibleDigits[digit] ];
+        // TODO: use other possible methods?
         const removeSingles = possibleNakedSingles(update);
+
+        const solution = getSolutionFromPossibles(removeSingles);
+        if (!isSolutionLogical(solution)) {
+          return null;
+        }
+
         const result = possibleBruteForce(removeSingles, currentDepth + 1);
 
         if (result) {
@@ -505,8 +555,12 @@ const possibleBruteForce = (cells, depth = 0) => {
   }
 
   const solution = getSolutionFromPossibles(update);
-  if (!update || (!isSolutionValid(solution) && currentDepth === 0)) {
-    return cells;
+  if (!update || !isSolutionValid(solution)) {
+    if (currentDepth > 0) {
+      return null;
+    } else {
+      return cells;
+    }
   }
 
   return update;
@@ -957,8 +1011,6 @@ const updateHiddenPossibles = (set, length) => {
       valid.forEach(cell => {
         cell.possible = cell.possible.filter(digit => target.includes(digit));
       });
-
-      // console.log(target, set);
     }
   });
 };
@@ -1083,8 +1135,6 @@ const App = () => {
           return cell.possible[0];
         });
       });
-
-      // console.log("complete:", isGameComplete(update), "solution:", isSolutionValid(solution));
 
       updateGameOptions({
         hasSolution: isSolutionValid(solution),
