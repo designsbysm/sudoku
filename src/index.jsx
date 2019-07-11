@@ -88,11 +88,7 @@ const getPossibleSearchDigits = (set, min, max) => {
 };
 
 const getPossibleValues = (cells, pipeline) => {
-  const hashPossibles = grid => grid.map(r => r.map(cell => cell.possible.join(""))
-    .join(""))
-    .join("");
-
-  const hasChanges = (before, after) => hashPossibles(before) !== hashPossibles(after);
+  console.time("getPossibleValues");
 
   let possibles = cells.map(r => {
     return r.map(cell => {
@@ -120,7 +116,7 @@ const getPossibleValues = (cells, pipeline) => {
 
       // console.time(key);
       const result = fn(possibles);
-      changes = hasChanges(possibles, result);
+      changes = hasPossibleChanges(possibles, result);
       // console.timeEnd(key);
 
       if (changes) {
@@ -135,6 +131,7 @@ const getPossibleValues = (cells, pipeline) => {
     }
   }
 
+  console.timeEnd("getPossibleValues");
   console.table(scores);
 
   return possibles;
@@ -179,6 +176,18 @@ const getTargetDigits = (digits, length) => {
   }
 
   return [ ...unique ].map(test => [ ...test ].map(number => parseInt(number, 10)));
+};
+
+const hasPossibleChanges = (before, after) => {
+  if (!before || !after) {
+    return null;
+  }
+
+  const hashPossibles = grid => grid.map(r => r.map(cell => cell.possible.join(""))
+    .join(""))
+    .join("");
+
+  return hashPossibles(before) !== hashPossibles(after);
 };
 
 const hintCellValue = (cells, current) => {
