@@ -285,13 +285,13 @@ const isMoveStillValid = cells => {
   return update;
 };
 
-const isSolutionValid = values => {
+const isSolutionLogical = values => {
   if (!values) {
     return false;
   }
 
-  const rows = values;
   /* eslint-disable array-element-newline */
+  const rows = values;
   const columns = [ [], [], [], [], [], [], [], [], [] ];
   /* eslint-enable array-element-newline */
 
@@ -305,12 +305,50 @@ const isSolutionValid = values => {
   [
     ...rows,
     ...columns, 
-  ].forEach(r => {
+  ]
+    .map(unit => unit.filter(digit => digit !== 0))
+    .map(unit => unit.join(""))
+    .forEach(unit => {
+      if (!valid) {
+        return;
+      } else if (/(.).*\1/.test(unit)) {
+        valid = false;
+      }
+    });
+
+  return valid;
+};
+
+const isSolutionValid = values => {
+  if (!values) {
+    return false;
+  }
+
+  /* eslint-disable array-element-newline */
+  const rows = values;
+  const columns = [ [], [], [], [], [], [], [], [], [] ];
+  /* eslint-enable array-element-newline */
+
+  values.forEach(row => {
+    row.forEach((cell, index) => {
+      columns[index].push(cell);
+    });
+  });
+
+  let valid = true;
+  [
+    ...rows,
+    ...columns, 
+  ].forEach(unit => {
+    if (!valid) {
+      return;
+    }
+
     /* eslint-disable array-element-newline */
     let test = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
     /* eslint-enable array-element-newline */
 
-    r.forEach(cell => {
+    unit.forEach(cell => {
       test = test.filter(value => value !== cell);
     });
 
