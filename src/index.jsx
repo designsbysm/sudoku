@@ -446,87 +446,51 @@ const newGame = importGrid => {
   let puzzle = [];
 
   if (importGrid) {
-    let index = 1;
-    let row = [];
-    puzzle = [];
+    /* eslint-disable array-element-newline */
+    puzzle = [ [], [], [], [], [], [], [], [], [] ];
+    /* eslint-enable array-element-newline */
+
+    const puzzleCells = getCleanCopyOfCells(cells);
+    let column = 0;
+    let row = 0;
 
     [ ...importGrid ].forEach(digit => {
-      row.push(parseInt(digit, 10) || 0);
+      const value = parseInt(digit, 10) || 0;
+      puzzle[row][column] = value;
+      if (value) {
+        puzzleCells[row][column].value = value;
+      }
 
-      index++;
-      if (index > 9) {
-        puzzle.push(row);
-        row = [];
-        index = 1;
+      column++;
+      if (column > 8) {
+        column = 0;
+        row++;
       }
     });
-  } else {
-    /* eslint-disable array-element-newline */
-    puzzle = [
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    ];
 
-    // puzzle = [
-    //   [ 3, 0, 0, 8, 0, 2, 0, 0, 0 ],
-    //   [ 5, 0, 2, 0, 0, 0, 0, 0, 0 ],
-    //   [ 0, 8, 0, 3, 0, 0, 0, 9, 0 ],
-    //   [ 8, 0, 0, 7, 0, 0, 0, 0, 0 ],
-    //   [ 0, 2, 0, 0, 0, 0, 0, 7, 0 ],
-    //   [ 0, 0, 0, 0, 0, 4, 0, 0, 6 ],
-    //   [ 0, 6, 0, 0, 0, 9, 0, 4, 0 ],
-    //   [ 0, 0, 0, 0, 0, 0, 7, 0, 2 ],
-    //   [ 0, 0, 0, 4, 0, 8, 0, 0, 1 ],
-    // ];
-
-    // solution = [
-    //   [ 3, 7, 9, 8, 4, 2, 6, 1, 5 ],
-    //   [ 5, 1, 2, 6, 9, 7, 3, 8, 4 ],
-    //   [ 6, 8, 4, 3, 1, 5, 2, 9, 7 ],
-    //   [ 8, 4, 6, 7, 2, 1, 5, 3, 9 ],
-    //   [ 9, 2, 1, 5, 6, 3, 4, 7, 8 ],
-    //   [ 7, 3, 5, 9, 8, 4, 1, 2, 6 ],
-    //   [ 1, 6, 7, 2, 5, 9, 8, 4, 3 ],
-    //   [ 4, 9, 8, 1, 3, 6, 7, 5, 2 ],
-    //   [ 2, 5, 3, 4, 7, 8, 9, 6, 1 ],
-    // ];
-    /* eslint-enable array-element-newline */
-  }
-
-  for (let row = 1; row < 10; row++) {
-    for (let column = 1; column < 10; column++) {
-      if (puzzle[row - 1][column - 1]) {
-        cells[row - 1][column - 1].predefined = true;
-        cells[row - 1][column - 1].value = puzzle[row - 1][column - 1];
-      }
-    }
-  }
-
-  const test = generateNewPuzzle(cells);
-  console.log(test);
-
-  if (solution.length === 0) {
-    const possibles = getPossibleValues(cells, possiblePipeline);
+    const possibles = getPossibleValues(puzzleCells, possiblePipeline);
     solution = getSolutionFromPossibles(possibles);
+  } else {
+    const newPuzzle = generateNewPuzzle(cells);
+
+    puzzle = newPuzzle.puzzle;
+    solution = newPuzzle.solution;
+  }
+
+  for (let row = 0; row < 9; row++) {
+    for (let column = 0; column < 9; column++) {
+      if (puzzle[row][column]) {
+        cells[row][column].predefined = true;
+        cells[row][column].value = puzzle[row][column];
+      }
+
+      cells[row][column].solution = solution[row][column];
+    }
   }
 
   if (!isSolutionValid(solution)) {
     // TODO: warn user
     console.error("no solution found", solution);
-  } else {
-    // add solution to cells
-    for (let row = 1; row < 10; row++) {
-      for (let column = 1; column < 10; column++) {
-        cells[row - 1][column - 1].solution = solution[row - 1][column - 1];
-      }
-    }
   }
 
   return cells;
