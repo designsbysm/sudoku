@@ -459,7 +459,7 @@ const newGame = importGrid => {
     puzzle = [];
 
     [ ...importGrid ].forEach(digit => {
-      row.push(parseInt(digit, 10));
+      row.push(parseInt(digit, 10) || 0);
 
       index++;
       if (index > 9) {
