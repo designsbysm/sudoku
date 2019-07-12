@@ -9,26 +9,6 @@ import "./styles/index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faLightbulb, faPenFancy, faPencil, faUndo } from "@fortawesome/pro-light-svg-icons";
 
-const shuffleArray = original => {
-  const shuffled = [ ...original ];
-  let counter = original.length;
-  let temp;
-  let index;
-
-  while (counter > 0) {
-    // pick a random element
-    index = Math.floor(Math.random() * counter);
-    counter--;
-
-    // and swap the last element with it
-    temp = shuffled[counter];
-    shuffled[counter] = shuffled[index];
-    shuffled[index] = temp;
-  }
-
-  return shuffled;
-};
-
 const allowCellUpdate = (cells, current) => {
   const { column, row } = current;
   if (column === -1 && row === -1) {
@@ -55,6 +35,22 @@ const applyPossibleValues = (cells, possibles) => {
   return update;
 };
 
+const convertCellsToPossibles = cells =>
+  cells.map(r => {
+    return r.map(cell => {
+      const { column, grid, row, value } = cell;
+
+      /* eslint-disable array-element-newline */
+      return {
+        column,
+        grid,
+        possible: value ? [ value ] : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        row,
+      };
+      /* eslint-enable array-element-newline */
+    });
+  });
+
 const countPossibles = cells => {
   const count = {};
 
@@ -65,6 +61,16 @@ const countPossibles = cells => {
   });
 
   return count;
+};
+
+const generateNewPuzzle = setup => {
+  const possibles = convertCellsToPossibles(setup);
+  const grid = possibleBruteForce(possibles);
+
+  const solution = getSolutionFromPossibles(grid);
+  const puzzle = getSolutionFromPossibles(possibles);
+
+  return { puzzle, solution };
 };
 
 const getCellsByLeastPossibles = possibles => {
@@ -132,22 +138,8 @@ const getPossibleSearchDigits = (set, min, max) => {
 const getPossibleValues = (cells, pipeline) => {
   console.time("getPossibleValues");
 
-  let possibles = cells.map(r => {
-    return r.map(cell => {
-      const { column, grid, row, value } = cell;
-
-      /* eslint-disable array-element-newline */
-      return {
-        column,
-        grid,
-        possible: value ? [ value ] : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
-        row,
-      };
-      /* eslint-enable array-element-newline */
-    });
-  });
-
   let continueSearch = true;
+  let possibles = convertCellsToPossibles(cells);
   const scores = {};
 
   while (continueSearch) {
@@ -327,39 +319,39 @@ const isMoveStillValid = cells => {
   return update;
 };
 
-const isSolutionLogical = values => {
-  if (!values) {
-    return false;
-  }
+// const isSolutionLogical = values => {
+//   if (!values) {
+//     return false;
+//   }
 
-  /* eslint-disable array-element-newline */
-  const rows = values;
-  const columns = [ [], [], [], [], [], [], [], [], [] ];
-  /* eslint-enable array-element-newline */
+//   /* eslint-disable array-element-newline */
+//   const rows = values;
+//   const columns = [ [], [], [], [], [], [], [], [], [] ];
+//   /* eslint-enable array-element-newline */
 
-  values.forEach(row => {
-    row.forEach((cell, index) => {
-      columns[index].push(cell);
-    });
-  });
+//   values.forEach(row => {
+//     row.forEach((cell, index) => {
+//       columns[index].push(cell);
+//     });
+//   });
 
-  let valid = true;
-  [
-    ...rows,
-    ...columns, 
-  ]
-    .map(unit => unit.filter(digit => digit !== 0))
-    .map(unit => unit.join(""))
-    .forEach(unit => {
-      if (!valid) {
-        return;
-      } else if (/(.).*\1/.test(unit)) {
-        valid = false;
-      }
-    });
+//   let valid = true;
+//   [
+//     ...rows,
+//     ...columns, 
+//   ]
+//     .map(unit => unit.filter(digit => digit !== 0))
+//     .map(unit => unit.join(""))
+//     .forEach(unit => {
+//       if (!valid) {
+//         return;
+//       } else if (/(.).*\1/.test(unit)) {
+//         valid = false;
+//       }
+//     });
 
-  return valid;
-};
+//   return valid;
+// };
 
 const isSolutionValid = values => {
   if (!values) {
@@ -469,7 +461,43 @@ const newGame = importGrid => {
       }
     });
   } else {
-    console.log("generate puzzle");
+    /* eslint-disable array-element-newline */
+    puzzle = [
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    ];
+
+    // puzzle = [
+    //   [ 3, 0, 0, 8, 0, 2, 0, 0, 0 ],
+    //   [ 5, 0, 2, 0, 0, 0, 0, 0, 0 ],
+    //   [ 0, 8, 0, 3, 0, 0, 0, 9, 0 ],
+    //   [ 8, 0, 0, 7, 0, 0, 0, 0, 0 ],
+    //   [ 0, 2, 0, 0, 0, 0, 0, 7, 0 ],
+    //   [ 0, 0, 0, 0, 0, 4, 0, 0, 6 ],
+    //   [ 0, 6, 0, 0, 0, 9, 0, 4, 0 ],
+    //   [ 0, 0, 0, 0, 0, 0, 7, 0, 2 ],
+    //   [ 0, 0, 0, 4, 0, 8, 0, 0, 1 ],
+    // ];
+
+    // solution = [
+    //   [ 3, 7, 9, 8, 4, 2, 6, 1, 5 ],
+    //   [ 5, 1, 2, 6, 9, 7, 3, 8, 4 ],
+    //   [ 6, 8, 4, 3, 1, 5, 2, 9, 7 ],
+    //   [ 8, 4, 6, 7, 2, 1, 5, 3, 9 ],
+    //   [ 9, 2, 1, 5, 6, 3, 4, 7, 8 ],
+    //   [ 7, 3, 5, 9, 8, 4, 1, 2, 6 ],
+    //   [ 1, 6, 7, 2, 5, 9, 8, 4, 3 ],
+    //   [ 4, 9, 8, 1, 3, 6, 7, 5, 2 ],
+    //   [ 2, 5, 3, 4, 7, 8, 9, 6, 1 ],
+    // ];
+    /* eslint-enable array-element-newline */
   }
 
   for (let row = 1; row < 10; row++) {
@@ -481,17 +509,12 @@ const newGame = importGrid => {
     }
   }
 
+  const test = generateNewPuzzle(cells);
+  console.log(test);
+
   if (solution.length === 0) {
     const possibles = getPossibleValues(cells, possiblePipeline);
-    solution = possibles.map(row => {
-      return row.map(cell => {
-        if (cell.possible.length > 1) {
-          return 0;
-        }
-
-        return cell.possible[0];
-      });
-    });
+    solution = getSolutionFromPossibles(possibles);
   }
 
   if (!isSolutionValid(solution)) {
@@ -507,6 +530,20 @@ const newGame = importGrid => {
   }
 
   return cells;
+};
+
+const poccessCellPossibleFN = (cells, fn, ...args) => {
+  const { columns, grids, rows } = splitRCM(cells);
+
+  [
+    ...rows,
+    ...columns,
+    ...grids, 
+  ].forEach(set => {
+    fn(set, ...args);
+  });
+
+  return possibleCreateUpdate(cells, rows);
 };
 
 const possibleBruteForce = (cells, depth = 0) => {
@@ -658,20 +695,6 @@ const possibleCreateUpdate = (cells, possibles) => {
     });
 
   return updates;
-};
-
-const poccessCellPossibleFN = (cells, fn, ...args) => {
-  const { columns, grids, rows } = splitRCM(cells);
-
-  [
-    ...rows,
-    ...columns,
-    ...grids, 
-  ].forEach(set => {
-    fn(set, ...args);
-  });
-
-  return possibleCreateUpdate(cells, rows);
 };
 
 const possibleHiddenSingles = cells => {
@@ -947,6 +970,26 @@ const setupCells = () => {
   }
 
   return cells;
+};
+
+const shuffleArray = original => {
+  const shuffled = [ ...original ];
+  let counter = original.length;
+  let temp;
+  let index;
+
+  while (counter > 0) {
+    // pick a random element
+    index = Math.floor(Math.random() * counter);
+    counter--;
+
+    // and swap the last element with it
+    temp = shuffled[counter];
+    shuffled[counter] = shuffled[index];
+    shuffled[index] = temp;
+  }
+
+  return shuffled;
 };
 
 const splitRCM = cells => {
