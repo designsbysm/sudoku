@@ -510,9 +510,27 @@ const newGame = importGrid => {
 };
 
 const possibleBruteForce = (cells, depth = 0) => {
+  const reducePossibles = possibles => {
+    let result = getCleanCopyOfCells(possibles);
+
+    for (const fn of [
+      possibleNakedSingles,
+      possibleHiddenSingles,
+      possibleNakedTwins,
+      possibleNakedTriplets, 
+    ]) {
+      result = fn(result);
+    }
+
+    if (hasPossibleChanges(possibles, result)) {
+      result = reducePossibles(result);
+    }
+
+    return result;
+  };
+
   let solutionFound = false;
   let update = getCleanCopyOfCells(cells);
-  const currentDepth = depth;
   const leastPossibles = getCellsByLeastPossibles(cells);
 
   if (leastPossibles.length > 1) {
@@ -522,15 +540,15 @@ const possibleBruteForce = (cells, depth = 0) => {
 
       for (let digit = 0; digit < possibleDigits.length; digit++) {
         update[cell.row - 1][cell.column - 1].possible = [ possibleDigits[digit] ];
-        // TODO: use other possible methods?
-        const removeSingles = possibleNakedSingles(update);
 
-        const solution = getSolutionFromPossibles(removeSingles);
-        if (!isSolutionLogical(solution)) {
-          return null;
-        }
+        const reduced = reducePossibles(update);
+        // const solution = getSolutionFromPossibles(reduced);
 
-        const result = possibleBruteForce(removeSingles, currentDepth + 1);
+        // if (!isSolutionLogical(solution)) {
+        //   return null;
+        // }
+
+        const result = possibleBruteForce(reduced, depth + 1);
 
         if (result) {
           solutionFound = true;
@@ -542,9 +560,11 @@ const possibleBruteForce = (cells, depth = 0) => {
 
       if (solutionFound) {
         break;
+        // } else {
+        // update = getCleanCopyOfCells(cells);
       }
     }
-  } else if (currentDepth > 0) {
+  } else if (depth > 0) {
     const solution = getSolutionFromPossibles(update);
 
     if (isSolutionValid(solution)) {
@@ -556,7 +576,7 @@ const possibleBruteForce = (cells, depth = 0) => {
 
   const solution = getSolutionFromPossibles(update);
   if (!update || !isSolutionValid(solution)) {
-    if (currentDepth > 0) {
+    if (depth > 0) {
       return null;
     } else {
       return cells;
