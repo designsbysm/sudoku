@@ -1,3 +1,5 @@
+@import "./colors";
+
 html {
   font-size: 14px;
 
@@ -28,7 +30,7 @@ body {
     width: 18em;
 
     .commands {
-      border: 1px solid #bec6d4;
+      border: 1px solid $color--cell-background;
       border-top: 0;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -53,7 +55,7 @@ body {
     }
 
     .number-pad {
-      border: 1px solid #bec6d4;
+      border: 1px solid $color--cell-background;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
@@ -73,8 +75,8 @@ body {
     }
 
     .button {
-      border-bottom: 1px solid #bec6d4;
-      border-right: 1px solid #bec6d4;
+      border-bottom: 1px solid $color--cell-background;
+      border-right: 1px solid $color--cell-background;
       cursor: pointer;
       display: grid;
       min-height: 3em;
@@ -83,7 +85,7 @@ body {
       place-items: center;
 
       &:hover {
-        background: rgba(#bec6d4, 0.4);
+        background: rgba($color--cell-background, 0.4);
       }
     }
   }

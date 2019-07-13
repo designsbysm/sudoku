@@ -1,6 +1,8 @@
+@import "./colors";
+
 .cell {
-  border-bottom: 1px solid #000;
-  border-right: 1px solid #000;
+  border-bottom: 1px solid $color--cell-border;
+  border-right: 1px solid $color--cell-border;
   cursor: pointer;
   display: grid;
   padding: 0.1em;
@@ -12,7 +14,7 @@
     grid-template-rows: repeat(3, 1fr);
 
     .item {
-      color: #666;
+      color: $color--cell-notes;
       font-size: 12px;
       place-self: center;
     }
@@ -38,48 +40,48 @@
     }
 
     .value {
-      color: #f00;
+      color: $color--cell-error;
       display: block;
     }
   }
 
-  // &:nth-child(odd) {
-  //   background: rgba(#bec6d4, 0.2);
-  // }
-
   .success & {
-    background: rgba(#0f0, 0.6);
+    background: rgba($color--cell-sucess, 0.6);
 
     &.current {
-      background: rgba(#0f0, 0.6);
+      background: rgba($color--cell-sucess, 0.6);
     }
   }
 
   &.current {
-    background: rgba(#bec6d4, 0.4);
+    background: rgba($color--cell-background, 0.4);
   }
 
   .error &,
   &.error {
-    background: rgba(#f00, 0.6);
+    background: rgba($color--cell-error, 0.6);
 
     &.current {
-      background: rgba(#f00, 0.8);
+      background: rgba($color--cell-error, 0.8);
     }
   }
 
   &.predefined {
-    background: rgba(#bec6d4, 0.6);
+    background: rgba($color--cell-background, 0.6);
+
+    &.current {
+      background: rgba($color--cell-background, 0.8);
+    }
   }
 
   &:nth-child(3n) {
-    border-right: 3px solid #000;
+    border-right: 3px solid $color--cell-border;
   }
 
   &:nth-child(n + 19):nth-child(-n + 27),
   &:nth-child(n + 46):nth-child(-n + 54),
   &:nth-child(n + 73) {
-    border-bottom: 3px solid #000;
+    border-bottom: 3px solid $color--cell-border;
   }
 
   &:nth-child(9n) {

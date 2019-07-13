@@ -1,5 +1,7 @@
+@import "./colors";
+
 .grid {
-  border: 5px solid #000;
+  border: 5px solid $color--cell-border;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
