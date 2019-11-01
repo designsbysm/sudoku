@@ -63,12 +63,106 @@ const countPossibles = cells => {
   return count;
 };
 
-const generateNewPuzzle = setup => {
+const generateNewPuzzle = (setup, level) => {
+  const cellsToEmpty = (min, max) => parseInt(randomNumber(min, max) / 2, 10);
+
+  const randomNumber = (min, max) => parseInt((max - min + 1) * Math.random(), 10) + min;
+
   const possibles = convertCellsToPossibles(setup);
   const grid = possibleBruteForce(possibles);
 
   const solution = getSolutionFromPossibles(grid);
-  const puzzle = getSolutionFromPossibles(possibles);
+  // const puzzle = getSolutionFromPossibles(possibles);
+  const puzzle = solution.map(unit => {
+    return [ ...unit ];
+  });
+
+  let emptyLevel = 0;
+
+  switch (level) {
+    case "extreme":
+      emptyLevel = cellsToEmpty(54, 58);
+      break;
+
+    case "difficult":
+      emptyLevel = cellsToEmpty(50, 53);
+      break;
+
+    case "medium":
+      emptyLevel = cellsToEmpty(46, 49);
+      break;
+
+    default:
+      emptyLevel = cellsToEmpty(40, 45);
+  }
+
+  const empty = {};
+
+  for (let index = 0; index < emptyLevel; index++) {
+    // const toEmpty = [];
+    let emptySearch = true;
+
+    while (emptySearch) {
+      const row = randomNumber(1, 9);
+      const column = randomNumber(1, 9);
+
+      // console.log(empty[`${row}${column}`]);
+
+      if (!empty[`${row}${column}`]) {
+        //   break;
+        // } else {
+        emptySearch = false;
+
+        const mirrorRow = 10 - row;
+        const mirrorColumn = 10 - column;
+
+        empty[`${row}${column}`] = true;
+        empty[`${mirrorRow}${mirrorColumn}`] = true;
+
+        puzzle[row - 1][column - 1] = 0;
+        puzzle[mirrorRow - 1][mirrorColumn - 1] = 0;
+      }
+    }
+
+    // console.log(row, column);
+    // console.log(10 - row, 10 - column);
+
+    // console.log(puzzle, puzzle[row - 1][column - 1], puzzle[mirrorRow - 1][mirrorColumn - 1]);
+
+    // puzzle[row-1][column-1].value=0;
+  }
+
+  const cells = setupCells();
+
+  puzzle.forEach((r, row) =>
+    r.forEach((c, column) => {
+      // console.log(row, column);
+
+      cells[row][column].value = c;
+    }),
+  );
+
+  console.log(cells);
+  // const zeros = puzzle
+  //   .flat()
+  //   .map(digit => {
+  //     if (digit === 0) {
+  //       return 1;
+  //     } else {
+  //       return 0;
+  //     }
+  //   })
+  //   .reduce((current, accum) => {
+  //     return accum + current;
+  //   });
+
+  // console.log(zeros);
+  const possible = getPossibleValues(cells, possiblePipeline);
+  const s = getSolutionFromPossibles(possible);
+  const least = getCellsByLeastPossibles(possible);
+
+  console.log(isSolutionValid(s),least);
+
 
   return { puzzle, solution };
 };
@@ -250,6 +344,7 @@ const initialCurrentCell = {
 const initialGameOptions = {
   hasSolution: true,
   isComplete: false,
+  level: "easy",
   mounted: false,
   penMode: true,
   puzzle: "",
@@ -338,7 +433,7 @@ const isMoveStillValid = cells => {
 //   let valid = true;
 //   [
 //     ...rows,
-//     ...columns, 
+//     ...columns,
 //   ]
 //     .map(unit => unit.filter(digit => digit !== 0))
 //     .map(unit => unit.join(""))
@@ -439,7 +534,7 @@ const moveCurrent = (key, col, row) => {
   };
 };
 
-const newGame = importGrid => {
+const newGame = (importGrid, level) => {
   const cells = setupCells();
 
   let solution = [];
@@ -471,10 +566,12 @@ const newGame = importGrid => {
     const possibles = getPossibleValues(puzzleCells, possiblePipeline);
     solution = getSolutionFromPossibles(possibles);
   } else {
-    const newPuzzle = generateNewPuzzle(cells);
+    const newPuzzle = generateNewPuzzle(cells, level);
 
     puzzle = newPuzzle.puzzle;
     solution = newPuzzle.solution;
+
+    console.log(solution, puzzle, cells);
   }
 
   for (let row = 0; row < 9; row++) {
@@ -893,22 +990,22 @@ const possiblePipeline = [
   possiblePointingPairs,
   possibleClaimingPairs,
   possibleXWing,
-  possibleBruteForce,
+  // possibleBruteForce,
 ];
 
-const removeRCMNote = (key, cells, current) => {
-  const digit = parseInt(key, 10);
-  const update = getCleanCopyOfCells(cells);
+// const removeRCMNote = (key, cells, current) => {
+//   const digit = parseInt(key, 10);
+//   const update = getCleanCopyOfCells(cells);
 
-  update.forEach(r => {
-    r.forEach(cell => {
-      if (cell.column === current.column || cell.grid === current.grid || cell.row === current.row)
-        cell.notes = cell.notes.filter(value => value !== digit);
-    });
-  });
+//   update.forEach(r => {
+//     r.forEach(cell => {
+//       if (cell.column === current.column || cell.grid === current.grid || cell.row === current.row)
+//         cell.notes = cell.notes.filter(value => value !== digit);
+//     });
+//   });
 
-  return update;
-};
+//   return update;
+// };
 
 const setupCells = () => {
   const cells = [];
@@ -1116,10 +1213,13 @@ const App = () => {
   const hintCell = () => {
     let update = hintCellValue(cells, currentCell);
 
+    // const key = update[currentCell.row - 1][currentCell.column - 1].solution;
+    // update = removeRCMNote(key, update, currentCell);
+
     const possibles = getPossibleValues(update, possiblePipeline);
     update = applyPossibleValues(update, possibles);
 
-    console.log(isGameComplete(update));
+    // leastPossibles()
 
     setCells(update);
   };
@@ -1129,9 +1229,11 @@ const App = () => {
   };
 
   const startGame = puzzle => {
-    const game = newGame(puzzle);
+    let game = newGame(puzzle, gameOptions.level);
+
     // const possibles = getPossibleValues(game, [ possibleNakedSingles ]);
-    // const updated = applyPossibleValues(game, possibles);
+    const possibles = getPossibleValues(game, possiblePipeline);
+    game = applyPossibleValues(game, possibles);
 
     setCells(game);
   };
@@ -1149,22 +1251,13 @@ const App = () => {
 
     if (gameOptions.penMode) {
       update = updateCellValue(key, cells, currentCell);
-      update = removeRCMNote(key, update, currentCell);
       update = isMoveStillValid(update);
 
+      // update = removeRCMNote(key, update, currentCell);
       const possibles = getPossibleValues(update, possiblePipeline);
-      const solution = possibles.map(row => {
-        return row.map(cell => {
-          if (cell.possible.length > 1) {
-            return 0;
-          }
-
-          return cell.possible[0];
-        });
-      });
+      update = applyPossibleValues(update, possibles);
 
       updateGameOptions({
-        hasSolution: isSolutionValid(solution),
         isComplete: isGameComplete(update),
       });
     } else {
