@@ -3,22 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.26",
-    "@fortawesome/pro-light-svg-icons": "^5.12.0",
-    "@fortawesome/pro-solid-svg-icons": "^5.12.0",
-    "@fortawesome/react-fontawesome": "^0.1.8",
     "node-sass": "^4.14.1",
-    "react": "^16.12.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/pro-light-svg-icons": "^5.15.1",
+    "@fortawesome/pro-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.13",
+    "react": "^17.0.1",
     "react-copy-to-clipboard": "^5.0.2",
-    "react-dom": "^16.12.0",
     "react-scripts": "3.3.0",
+    "react-dom": "^17.0.1",
     "serve": "^11.3.2"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "prettier": "^1.19.1",
-    "stylelint": "^12.0.1",
-    "stylelint-config-sass-guidelines": "^6.2.0"
+    "prettier": "^2.2.1",
+    "stylelint": "^13.8.0",
+    "stylelint-config-sass-guidelines": "^7.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
