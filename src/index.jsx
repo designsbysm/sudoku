@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
-//components
+// components
 import Grid from "./components/grid";
 
-//assets
+// assets
 import "./styles/index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faLightbulb, faPenFancy, faPencil, faUndo } from "@fortawesome/pro-light-svg-icons";
@@ -44,7 +44,7 @@ const convertCellsToPossibles = cells =>
       return {
         column,
         grid,
-        possible: value ? [ value ] : [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        possible: value ? [value] : [1, 2, 3, 4, 5, 6, 7, 8, 9],
         row,
       };
       /* eslint-enable array-element-newline */
@@ -74,7 +74,7 @@ const generateNewPuzzle = (setup, level) => {
   const solution = getSolutionFromPossibles(grid);
   // const puzzle = getSolutionFromPossibles(possibles);
   const puzzle = solution.map(unit => {
-    return [ ...unit ];
+    return [...unit];
   });
 
   let emptyLevel = 0;
@@ -142,7 +142,7 @@ const generateNewPuzzle = (setup, level) => {
     }),
   );
 
-  console.log(cells);
+  // console.log(cells);
   // const zeros = puzzle
   //   .flat()
   //   .map(digit => {
@@ -161,8 +161,7 @@ const generateNewPuzzle = (setup, level) => {
   const s = getSolutionFromPossibles(possible);
   const least = getCellsByLeastPossibles(possible);
 
-  console.log(isSolutionValid(s),least);
-
+  // console.log(isSolutionValid(s), least);
 
   return { puzzle, solution };
 };
@@ -230,7 +229,7 @@ const getPossibleSearchDigits = (set, min, max) => {
 };
 
 const getPossibleValues = (cells, pipeline) => {
-  console.time("getPossibleValues");
+  // console.time("getPossibleValues");
 
   let continueSearch = true;
   let possibles = convertCellsToPossibles(cells);
@@ -259,8 +258,8 @@ const getPossibleValues = (cells, pipeline) => {
     }
   }
 
-  console.timeEnd("getPossibleValues");
-  console.table(scores);
+  // console.timeEnd("getPossibleValues");
+  // console.table(scores);
 
   return possibles;
 };
@@ -295,7 +294,7 @@ const getTargetDigits = (digits, length) => {
   const stringDitgits = digits.map(number => number.toString());
 
   for (let x = start + 1; x < end; x++) {
-    const test = [ ...x.toString() ];
+    const test = [...x.toString()];
 
     if (!/(.).*\1/.test(x) && test.every(number => stringDitgits.includes(number))) {
       unique.add(test.sort()
@@ -303,7 +302,7 @@ const getTargetDigits = (digits, length) => {
     }
   }
 
-  return [ ...unique ].map(test => [ ...test ].map(number => parseInt(number, 10)));
+  return [...unique].map(test => [...test].map(number => parseInt(number, 10)));
 };
 
 const hasPossibleChanges = (before, after) => {
@@ -324,7 +323,7 @@ const hintCellValue = (cells, current) => {
     return cells;
   }
 
-  const update = [ ...cells ];
+  const update = [...cells];
 
   if (update[row - 1][column - 1].solution) {
     update[row - 1][column - 1].predefined = true;
@@ -455,7 +454,7 @@ const isSolutionValid = values => {
 
   /* eslint-disable array-element-newline */
   const rows = values;
-  const columns = [ [], [], [], [], [], [], [], [], [] ];
+  const columns = [[], [], [], [], [], [], [], [], []];
   /* eslint-enable array-element-newline */
 
   values.forEach(row => {
@@ -467,14 +466,14 @@ const isSolutionValid = values => {
   let valid = true;
   [
     ...rows,
-    ...columns, 
+    ...columns,
   ].forEach(unit => {
     if (!valid) {
       return;
     }
 
     /* eslint-disable array-element-newline */
-    let test = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+    let test = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     /* eslint-enable array-element-newline */
 
     unit.forEach(cell => {
@@ -542,14 +541,14 @@ const newGame = (importGrid, level) => {
 
   if (importGrid) {
     /* eslint-disable array-element-newline */
-    puzzle = [ [], [], [], [], [], [], [], [], [] ];
+    puzzle = [[], [], [], [], [], [], [], [], []];
     /* eslint-enable array-element-newline */
 
     const puzzleCells = getCleanCopyOfCells(cells);
     let column = 0;
     let row = 0;
 
-    [ ...importGrid ].forEach(digit => {
+    [...importGrid].forEach(digit => {
       const value = parseInt(digit, 10) || 0;
       puzzle[row][column] = value;
       if (value) {
@@ -571,7 +570,7 @@ const newGame = (importGrid, level) => {
     puzzle = newPuzzle.puzzle;
     solution = newPuzzle.solution;
 
-    console.log(solution, puzzle, cells);
+    // console.log(solution, puzzle, cells);
   }
 
   for (let row = 0; row < 9; row++) {
@@ -599,7 +598,7 @@ const poccessCellPossibleFN = (cells, fn, ...args) => {
   [
     ...rows,
     ...columns,
-    ...grids, 
+    ...grids,
   ].forEach(set => {
     fn(set, ...args);
   });
@@ -615,7 +614,7 @@ const possibleBruteForce = (cells, depth = 0) => {
       possibleNakedSingles,
       possibleHiddenSingles,
       possibleNakedTwins,
-      possibleNakedTriplets, 
+      possibleNakedTriplets,
     ]) {
       result = fn(result);
     }
@@ -637,7 +636,7 @@ const possibleBruteForce = (cells, depth = 0) => {
       const possibleDigits = shuffleArray(cell.possible);
 
       for (let digit = 0; digit < possibleDigits.length; digit++) {
-        update[cell.row - 1][cell.column - 1].possible = [ possibleDigits[digit] ];
+        update[cell.row - 1][cell.column - 1].possible = [possibleDigits[digit]];
 
         const reduced = reducePossibles(update);
         // const solution = getSolutionFromPossibles(reduced);
@@ -733,7 +732,7 @@ const possibleClaimingPairs = cells => {
 
   [
     ...rows,
-    ...columns, 
+    ...columns,
   ].forEach(set => {
     searchSet(set, grids);
   });
@@ -871,7 +870,7 @@ const possiblePointingPairs = cells => {
 
   const { columns, grids, rows } = splitRCM(cells);
 
-  [ ...grids ].forEach(set => {
+  [...grids].forEach(set => {
     searchSet(set, rows, columns);
   });
 
@@ -911,7 +910,7 @@ const possibleXWing = cells => {
 
           search.id = [
             subset[0][search.type],
-            subset[1][search.type], 
+            subset[1][search.type],
           ];
           exclude.id = subset[0][exclude.type];
 
@@ -950,7 +949,7 @@ const possibleXWing = cells => {
             };
             combined.exclude.id = [
               current.exclude.id,
-              accum.exclude.id, 
+              accum.exclude.id,
             ];
 
             return combined;
@@ -1034,7 +1033,7 @@ const setupCells = () => {
 };
 
 const shuffleArray = original => {
-  const shuffled = [ ...original ];
+  const shuffled = [...original];
   let counter = original.length;
   let temp;
   let index;
@@ -1055,11 +1054,11 @@ const shuffleArray = original => {
 
 const splitRCM = cells => {
   /* eslint-disable array-element-newline */
-  const rows = [ [], [], [], [], [], [], [], [], [] ];
+  const rows = [[], [], [], [], [], [], [], [], []];
 
-  const columns = [ [], [], [], [], [], [], [], [], [] ];
+  const columns = [[], [], [], [], [], [], [], [], []];
 
-  const grids = [ [], [], [], [], [], [], [], [], [] ];
+  const grids = [[], [], [], [], [], [], [], [], []];
   /* eslint-enable array-element-newline */
 
   cells.flat()
@@ -1095,7 +1094,7 @@ const updateCellNotes = (key, cells, current) => {
   } else if (!notes.includes(newValue)) {
     notes = [
       ...notes,
-      newValue, 
+      newValue,
     ];
   }
 
@@ -1271,7 +1270,7 @@ const App = () => {
     setMoveHistory(previous => {
       return [
         ...previous,
-        getCleanCopyOfCells(cells), 
+        getCleanCopyOfCells(cells),
       ];
     });
     setCells(update);
@@ -1288,11 +1287,11 @@ const App = () => {
 
   const undoMove = () => {
     if (moveHistory.length === 0) {
-      console.log("no more moves");
+      // console.log("no more moves");
       return;
     }
 
-    const moves = [ ...moveHistory ];
+    const moves = [...moveHistory];
     const last = moves.pop();
 
     setCells(last);
@@ -1301,22 +1300,22 @@ const App = () => {
 
   const [
     gameOptions,
-    setGameOptions, 
+    setGameOptions,
   ] = useState(initialGameOptions);
 
   const [
     cells,
-    setCells, 
+    setCells,
   ] = useState([]);
 
   const [
     currentCell,
-    setCurrentCell, 
+    setCurrentCell,
   ] = useState(initialCurrentCell);
 
   const [
     moveHistory,
-    setMoveHistory, 
+    setMoveHistory,
   ] = useState([]);
 
   useEffect(() => {

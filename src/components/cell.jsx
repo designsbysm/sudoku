@@ -1,13 +1,13 @@
 import React from "react";
 
-//assets
+// assets
 import "../styles/cell.scss";
 
 const Cell = ({ current, props, setCurrent }) => {
   const { column, grid, notes, predefined, row, status, value } = props;
 
   const getClasses = () => {
-    const classes = [ "cell" ];
+    const classes = ["cell"];
 
     if (current.column === column && current.row === row) {
       classes.push("current");

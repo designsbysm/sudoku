@@ -1,10 +1,10 @@
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import React from "react";
 
-//components
+// components
 import Cell from "./cell";
 
-//assets
+// assets
 import "../styles/grid.scss";
 
 const Grid = ({ cells, current, gameOtions, setCurrent }) => {
@@ -14,7 +14,7 @@ const Grid = ({ cells, current, gameOtions, setCurrent }) => {
     .join("");
 
   const getClasses = () => {
-    const classes = [ "grid" ];
+    const classes = ["grid"];
 
     if (gameOtions.isComplete) {
       classes.push("success");
