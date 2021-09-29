@@ -1,0 +1,17 @@
+{
+  "defaultSeverity": "warning",
+  "rules": {
+    "color-named": "never",
+    "comment-whitespace-inside": "always",
+    "selector-no-qualifying-type": [
+      true,
+      {
+        "ignore": [
+          "attribute",
+          "class"
+        ]
+      }
+    ],
+    "string-quotes": "double"
+  }
+}

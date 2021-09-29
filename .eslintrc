@@ -1,0 +1,127 @@
+{
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "react-hooks"
+  ],
+  "rules": {
+    "array-bracket-newline": [
+      "warn",
+      {
+        "multiline": true
+      }
+    ],
+    "array-element-newline": [
+      "warn",
+      "always"
+    ],
+    "arrow-parens": [
+      "warn",
+      "as-needed"
+    ],
+    "comma-dangle": [
+      "warn",
+      "always-multiline"
+    ],
+    "eol-last": [
+      "warn",
+      "always"
+    ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "indent": [
+      "warn",
+      2,
+      {
+        "ArrayExpression": 1,
+        "SwitchCase": 1
+      }
+    ],
+    "newline-per-chained-call": [
+      "warn",
+      {
+        "ignoreChainWithDepth": 1
+      }
+    ],
+    "no-cond-assign": [
+      "error",
+      "always"
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "error",
+          "info",
+          "warn"
+        ]
+      }
+    ],
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-empty": "warn",
+    "no-multi-spaces": "warn",
+    "no-multiple-empty-lines": [
+      "warn",
+      {
+        "max": 1,
+        "maxEOF": 0
+      }
+    ],
+    "no-shadow": "error",
+    "no-unreachable": "error",
+    "no-unused-vars": "error",
+    "no-var": "error",
+    "object-curly-spacing": [
+      "warn",
+      "always"
+    ],
+    "object-shorthand": [
+      "warn",
+      "always"
+    ],
+    "one-var": [
+      "error",
+      "never"
+    ],
+    "prefer-const": "error",
+    "quotes": [
+      "warn",
+      "double"
+    ],
+    "quote-props": [
+      "warn",
+      "as-needed"
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "require-await": "error",
+    "semi": [
+      "error",
+      "always"
+    ],
+    "sort-keys": "warn",
+    "spaced-comment": [
+      "warn",
+      "always"
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.jsx"
+      ],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    }
+  ]
+}
