@@ -105,7 +105,7 @@
     "react-hooks/exhaustive-deps": "warn",
     "require-await": "error",
     "semi": [
-      "error",
+      "warn",
       "always"
     ],
     "sort-keys": "warn",
