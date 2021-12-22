@@ -1,16 +1,17 @@
-FROM node:14.17.6-alpine
+FROM node:16.13.1-alpine
+
+ENV PATH /app/node_modules/.bin:$PATH
+WORKDIR /app
 
 ARG npm_token
-ENV PATH /app/node_modules/.bin:$PATH
-
-WORKDIR /app
-COPY . ./
-
 RUN npm config set "@fortawesome:registry" https://npm.fontawesome.com/
 RUN npm config set "//npm.fontawesome.com/:_authToken" $npm_token
 
-RUN npm install -g npm
+COPY ./package.json package.json
 RUN npm install --silent
+RUN npm install serve --silent
+
+COPY . .
 RUN npm run build
 
-CMD ["npm", "run", "serve"]
+CMD ["serve", "-s", "build"]
