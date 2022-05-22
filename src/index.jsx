@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 
 // components
-import Grid from "./components/grid";
+import Grid from './components/grid';
 
 // assets
-import "./styles/index.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEraser, faLightbulb, faPenFancy, faPencil, faUndo } from "@fortawesome/pro-light-svg-icons";
+import './styles/index.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEraser, faLightbulb, faPenFancy, faPencil, faUndo } from '@fortawesome/pro-light-svg-icons';
 
 const allowCellUpdate = (cells, current) => {
   const { column, row } = current;
@@ -80,15 +80,15 @@ const generateNewPuzzle = (setup, level) => {
   let emptyLevel = 0;
 
   switch (level) {
-    case "extreme":
+    case 'extreme':
       emptyLevel = cellsToEmpty(54, 58);
       break;
 
-    case "difficult":
+    case 'difficult':
       emptyLevel = cellsToEmpty(50, 53);
       break;
 
-    case "medium":
+    case 'medium':
       emptyLevel = cellsToEmpty(46, 49);
       break;
 
@@ -139,8 +139,7 @@ const generateNewPuzzle = (setup, level) => {
       // console.log(row, column);
 
       cells[row][column].value = c;
-    }),
-  );
+    }));
 
   // console.log(cells);
   // const zeros = puzzle
@@ -192,8 +191,7 @@ const getCleanCopyOfCells = cells =>
   cells.map(unit =>
     unit.map(cell => {
       return { ...cell };
-    }),
-  );
+    }));
 
 const getGridID = (col, row) => {
   let grid = 1;
@@ -239,7 +237,7 @@ const getPossibleValues = (cells, pipeline) => {
     let changes = false;
 
     for (const fn of pipeline) {
-      const key = fn.name.replace("possible", "");
+      const key = fn.name.replace('possible', '');
 
       // console.time(key);
       const result = fn(possibles);
@@ -279,14 +277,14 @@ const getTargetDigits = (digits, length) => {
   const start = parseInt(
     Array(length)
       .fill(1)
-      .join(""),
+      .join(''),
     10,
   );
 
   const end = parseInt(
     Array(length)
       .fill(9)
-      .join(""),
+      .join(''),
     10,
   );
 
@@ -298,7 +296,7 @@ const getTargetDigits = (digits, length) => {
 
     if (!/(.).*\1/.test(x) && test.every(number => stringDitgits.includes(number))) {
       unique.add(test.sort()
-        .join(""));
+        .join(''));
     }
   }
 
@@ -310,9 +308,9 @@ const hasPossibleChanges = (before, after) => {
     return null;
   }
 
-  const hashPossibles = grid => grid.map(r => r.map(cell => cell.possible.join(""))
-    .join(""))
-    .join("");
+  const hashPossibles = grid => grid.map(r => r.map(cell => cell.possible.join(''))
+    .join(''))
+    .join('');
 
   return hashPossibles(before) !== hashPossibles(after);
 };
@@ -327,7 +325,7 @@ const hintCellValue = (cells, current) => {
 
   if (update[row - 1][column - 1].solution) {
     update[row - 1][column - 1].predefined = true;
-    update[row - 1][column - 1].status = "";
+    update[row - 1][column - 1].status = '';
     update[row - 1][column - 1].value = update[row - 1][column - 1].solution;
   }
 
@@ -343,10 +341,10 @@ const initialCurrentCell = {
 const initialGameOptions = {
   hasSolution: true,
   isComplete: false,
-  level: "easy",
+  level: 'easy',
   mounted: false,
   penMode: true,
-  puzzle: "",
+  puzzle: '',
 };
 
 const isGameComplete = cells => {
@@ -402,9 +400,9 @@ const isMoveStillValid = cells => {
 
   update.forEach(r => {
     r.forEach(cell => {
-      if (cell.status === "error") {
+      if (cell.status === 'error') {
         if (isMoveValid(update, cell, cell.value)) {
-          cell.status = "";
+          cell.status = '';
         }
       }
     });
@@ -497,25 +495,25 @@ const moveCurrent = (key, col, row) => {
   let newRow = row;
 
   switch (key) {
-    case "ArrowLeft":
+    case 'ArrowLeft':
       if (col > 1) {
         newColumn -= 1;
       }
       break;
 
-    case "ArrowRight":
+    case 'ArrowRight':
       if (col < 9) {
         newColumn += 1;
       }
       break;
 
-    case "ArrowUp":
+    case 'ArrowUp':
       if (row > 1) {
         newRow -= 1;
       }
       break;
 
-    case "ArrowDown":
+    case 'ArrowDown':
       if (row < 9) {
         newRow += 1;
       }
@@ -586,7 +584,7 @@ const newGame = (importGrid, level) => {
 
   if (!isSolutionValid(solution)) {
     // TODO: warn user
-    console.error("no solution found", solution);
+    console.error('no solution found', solution);
   }
 
   return cells;
@@ -696,10 +694,10 @@ const possibleClaimingPairs = cells => {
 
         if (set.every(cell => cell.row === set[0].row)) {
           id = set[0].row;
-          direction = "row";
+          direction = 'row';
         } else if (set.every(cell => cell.column === set[0].column)) {
           id = set[0].column;
-          direction = "column";
+          direction = 'column';
         }
 
         return {
@@ -833,14 +831,14 @@ const possiblePointingPairs = cells => {
           digit,
           grid: set[0].grid,
           id: subset[0].row,
-          set: "row",
+          set: 'row',
         };
       } else if (subset.every(cell => cell.column === subset[0].column)) {
         return {
           digit,
           grid: set[0].grid,
           id: subset[0].column,
-          set: "column",
+          set: 'column',
         };
       } else {
         return null;
@@ -854,9 +852,9 @@ const possiblePointingPairs = cells => {
 
       let search = [];
 
-      if (found.set === "row") {
+      if (found.set === 'row') {
         search = rows[found.id - 1];
-      } else if (found.set === "column") {
+      } else if (found.set === 'column') {
         search = columns[found.id - 1];
       }
 
@@ -899,11 +897,11 @@ const possibleXWing = cells => {
               return cell.row === unit[0].row;
             })
           ) {
-            search.type = "column";
-            exclude.type = "row";
+            search.type = 'column';
+            exclude.type = 'row';
           } else {
-            search.type = "row";
-            exclude.type = "column";
+            search.type = 'row';
+            exclude.type = 'column';
           }
 
           const subset = unit.filter(cell => cell.possible.includes(digit));
@@ -918,7 +916,7 @@ const possibleXWing = cells => {
             digit,
             exclude,
             key: `${digit}${exclude.type}${subset.map(cell => cell[search.type])
-              .join("")}`,
+              .join('')}`,
             search,
           };
         });
@@ -1079,7 +1077,7 @@ const splitRCM = cells => {
 };
 
 const updateCellNotes = (key, cells, current) => {
-  if (!allowCellUpdate(cells, current) || key === "backspace") {
+  if (!allowCellUpdate(cells, current) || key === 'backspace') {
     return null;
   }
 
@@ -1111,13 +1109,13 @@ const updateCellValue = (key, cells, current) => {
   const { column, row } = current;
 
   let newValue = parseInt(key, 10);
-  if (key === "Backspace") {
+  if (key === 'Backspace') {
     newValue = 0;
   }
 
   const update = getCleanCopyOfCells(cells);
   update[row - 1][column - 1].notes = [];
-  update[row - 1][column - 1].status = isMoveValid(cells, current, newValue) ? "" : "error";
+  update[row - 1][column - 1].status = isMoveValid(cells, current, newValue) ? '' : 'error';
   update[row - 1][column - 1].value = newValue;
 
   return update;
@@ -1162,10 +1160,10 @@ const App = () => {
     const { key } = event;
 
     switch (key) {
-      case "ArrowDown":
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "ArrowUp":
+      case 'ArrowDown':
+      case 'ArrowLeft':
+      case 'ArrowRight':
+      case 'ArrowUp': {
         const { column, row } = currentCell;
         const newPosition = moveCurrent(key, column, row);
 
@@ -1174,34 +1172,34 @@ const App = () => {
         }
 
         break;
-
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-      case "Backspace":
+      }
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'Backspace':
         updateCell(key);
         break;
 
-      case "h":
-      case "H":
+      case 'h':
+      case 'H':
         hintCell(cells, currentCell);
         break;
 
-      case "n":
-      case "N":
+      case 'n':
+      case 'N':
         updateGameOptions({
           penMode: !gameOptions.penMode,
         });
         break;
 
-      case "u":
-      case "U":
+      case 'u':
+      case 'U':
         undoMove();
         break;
 
@@ -1319,19 +1317,19 @@ const App = () => {
   ] = useState([]);
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeydown);
+    window.addEventListener('keydown', handleKeydown);
 
     return () => {
-      window.removeEventListener("keydown", handleKeydown);
+      window.removeEventListener('keydown', handleKeydown);
     };
   });
 
   useEffect(() => {
     if (!gameOptions.mounted) {
-      let puzzle = "";
+      let puzzle = '';
 
-      if (window.location.search && window.location.search.startsWith("?")) {
-        puzzle = window.location.search.replace("?", "");
+      if (window.location.search && window.location.search.startsWith('?')) {
+        puzzle = window.location.search.replace('?', '');
 
         if (puzzle.length !== 81) {
           return;
@@ -1350,62 +1348,102 @@ const App = () => {
   });
 
   return (
-    <section className="content">
+    <section className='content'>
       <main>
-        <Grid cells={cells} current={currentCell} gameOtions={gameOptions} setCurrent={setCurrentCell} />
+        <Grid
+          cells={cells}
+          current={currentCell}
+          gameOtions={gameOptions}
+          setCurrent={setCurrentCell}
+        />
       </main>
       <aside onClick={() => resetCurrent()}>
-        <div className="number-pad">
-          <div onClick={() => updateCell(1)} className="button">
+        <div className='number-pad'>
+          <div
+            className='button'
+            onClick={() => updateCell(1)}>
             1
           </div>
-          <div onClick={() => updateCell(2)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(2)}>
             2
           </div>
-          <div onClick={() => updateCell(3)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(3)}>
             3
           </div>
-          <div onClick={() => updateCell(4)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(4)}>
             4
           </div>
-          <div onClick={() => updateCell(5)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(5)}>
             5
           </div>
-          <div onClick={() => updateCell(6)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(6)}>
             6
           </div>
-          <div onClick={() => updateCell(7)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(7)}>
             7
           </div>
-          <div onClick={() => updateCell(8)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(8)}>
             8
           </div>
-          <div onClick={() => updateCell(9)} className="button">
+          <div
+            className='button'
+            onClick={() => updateCell(9)}>
             9
           </div>
         </div>
-        <div className="commands">
+        <div className='commands'>
           <div
+            className='button'
             onClick={() =>
               updateGameOptions({
                 penMode: !gameOptions.penMode,
               })
-            }
-            className="button"
-          >
-            <FontAwesomeIcon icon={gameOptions.penMode ? faPenFancy : faPencil} size="2x" />
-            {gameOptions.penMode ? "Pen" : "Pencil"}
+            }>
+            <FontAwesomeIcon
+              icon={gameOptions.penMode ? faPenFancy : faPencil}
+              size='2x'
+            />
+            {gameOptions.penMode ? 'Pen' : 'Pencil'}
           </div>
-          <div onClick={() => updateCell(0)} className="button">
-            <FontAwesomeIcon icon={faEraser} size="2x" />
+          <div
+            className='button'
+            onClick={() => updateCell(0)}>
+            <FontAwesomeIcon
+              icon={faEraser}
+              size='2x'
+            />
             Delete
           </div>
-          <div onClick={() => hintCell(cells, currentCell)} className="button">
-            <FontAwesomeIcon icon={faLightbulb} size="2x" />
+          <div
+            className='button'
+            onClick={() => hintCell(cells, currentCell)}>
+            <FontAwesomeIcon
+              icon={faLightbulb}
+              size='2x'
+            />
             Hint
           </div>
-          <div onClick={() => undoMove()} className="button">
-            <FontAwesomeIcon icon={faUndo} size="2x" />
+          <div
+            className='button'
+            onClick={() => undoMove()}>
+            <FontAwesomeIcon
+              icon={faUndo}
+              size='2x'
+            />
             Undo
           </div>
         </div>
@@ -1414,4 +1452,4 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,28 +1,28 @@
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import React from "react";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import React from 'react';
 
 // components
-import Cell from "./cell";
+import Cell from './cell';
 
 // assets
-import "../styles/grid.scss";
+import '../styles/grid.scss';
 
 const Grid = ({ cells, current, gameOtions, setCurrent }) => {
   const puzzle = cells
     .map(r => r.map(cell => cell.value || 0))
     .flat()
-    .join("");
+    .join('');
 
   const getClasses = () => {
-    const classes = ["grid"];
+    const classes = ['grid'];
 
     if (gameOtions.isComplete) {
-      classes.push("success");
+      classes.push('success');
       // } else if (!gameOtions.hasSolution) {
       //   classes.push("error");
     }
 
-    return classes.join(" ");
+    return classes.join(' ');
   };
 
   return (
@@ -30,11 +30,15 @@ const Grid = ({ cells, current, gameOtions, setCurrent }) => {
       <div className={getClasses()}>
         {cells.map(r =>
           r.map(cell => (
-            <Cell key={`${cell.column}${cell.row}`} props={cell} current={current} setCurrent={setCurrent} />
-          )),
-        )}
+            <Cell
+              current={current}
+              key={`${cell.column}${cell.row}`}
+              props={cell}
+              setCurrent={setCurrent}
+            />
+          )))}
       </div>
-      <div className="puzzle">
+      <div className='puzzle'>
         <strong>Puzzle:</strong>&nbsp;&nbsp;
         <CopyToClipboard text={puzzle}>
           <span>{puzzle}</span>

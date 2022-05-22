@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 2021,
     "sourceType": "module",
@@ -7,7 +7,18 @@
       "jsx": true
     }
   },
+  "root": true,
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
   "plugins": [
+    "react",
     "react-hooks"
   ],
   "rules": {
@@ -27,7 +38,13 @@
     ],
     "comma-dangle": [
       "warn",
-      "always-multiline"
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "always-multiline"
+      }
     ],
     "eol-last": [
       "warn",
@@ -44,6 +61,14 @@
         "ArrayExpression": 1,
         "SwitchCase": 1
       }
+    ],
+    "function-call-argument-newline": [
+      "error",
+      "consistent"
+    ],
+    "function-paren-newline": [
+      "error",
+      "consistent"
     ],
     "newline-per-chained-call": [
       "warn",
@@ -79,6 +104,7 @@
     "no-shadow": "error",
     "no-unreachable": "error",
     "no-unused-vars": "error",
+    "no-undef": 0,
     "no-var": "error",
     "object-curly-spacing": [
       "warn",
@@ -95,14 +121,13 @@
     "prefer-const": "error",
     "quotes": [
       "warn",
-      "double"
+      "single"
     ],
     "quote-props": [
       "warn",
       "as-needed"
     ],
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "radix": "error",
     "require-await": "error",
     "semi": [
       "warn",
@@ -117,10 +142,36 @@
   "overrides": [
     {
       "files": [
-        "*.jsx"
+        "*.jsx",
+        "*.tsx"
       ],
       "rules": {
-        "no-unused-vars": "off"
+        "jsx-quotes": [
+          "warn",
+          "prefer-single"
+        ],
+        "no-unused-vars": "off",
+        "react/jsx-closing-bracket-location": [
+          "warn",
+          {
+            "selfClosing": "line-aligned",
+            "nonEmpty": "after-props"
+          }
+        ],
+        "react/jsx-first-prop-new-line": [
+          "warn",
+          "multiline-multiprop"
+        ],
+        "react/jsx-max-props-per-line": [
+          "error",
+          {
+            "maximum": 1
+          }
+        ],
+        "react/jsx-sort-props": "warn",
+        "react/prop-types": "off",
+        "react-hooks/exhaustive-deps": "warn",
+        "react-hooks/rules-of-hooks": "error"
       }
     }
   ]
