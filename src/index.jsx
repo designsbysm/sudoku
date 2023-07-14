@@ -156,9 +156,9 @@ const generateNewPuzzle = (setup, level) => {
   //   });
 
   // console.log(zeros);
-  const possible = getPossibleValues(cells, possiblePipeline);
-  const s = getSolutionFromPossibles(possible);
-  const least = getCellsByLeastPossibles(possible);
+  // const possible = getPossibleValues(cells, possiblePipeline);
+  // const s = getSolutionFromPossibles(possible);
+  // const least = getCellsByLeastPossibles(possible);
 
   // console.log(isSolutionValid(s), least);
 
