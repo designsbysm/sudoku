@@ -5,25 +5,26 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "docker": "docker buildx build --platform linux/amd64 --build-arg FONTAWESOME_NPM_TOKEN=${FONTAWESOME_NPM_TOKEN} --push -t smatthews02/sudoku:latest .",
     "test": "react-scripts test"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.1.1",
-    "@fortawesome/pro-light-svg-icons": "^6.1.1",
-    "@fortawesome/pro-solid-svg-icons": "^6.1.1",
-    "@fortawesome/react-fontawesome": "^0.1.18",
-    "react": "^18.1.0",
-    "react-copy-to-clipboard": "^5.1.0",
-    "react-dom": "^18.1.0",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/pro-light-svg-icons": "^7.3.1",
+    "@fortawesome/pro-solid-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
+    "react": "^19.3.1",
+    "react-copy-to-clipboard": "^5.1.1",
+    "react-dom": "^19.3.1",
     "react-scripts": "5.0.1",
-    "sass": "^1.52.1"
+    "sass": "^1.108.2"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.17.0",
-    "@babel/preset-react": "^7.17.12",
-    "eslint": "^8.16.0",
-    "eslint-plugin-react": "^7.30.0",
-    "eslint-plugin-react-hooks": "^4.5.0"
+    "@babel/eslint-parser": "^8.1.2",
+    "@babel/preset-react": "^8.0.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1"
   },
   "browserslist": {
     "production": [

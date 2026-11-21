@@ -1,6 +1,9 @@
-FROM node:18.16.1-alpine
+FROM node:26-alpine
+
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 RUN npm install -g http-server
+RUN npm install -g corepack && corepack enable
 
 ARG FONTAWESOME_NPM_TOKEN
 RUN npm config set "@fortawesome:registry" https://npm.fontawesome.com/

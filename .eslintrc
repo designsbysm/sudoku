@@ -150,7 +150,6 @@
           "warn",
           "prefer-single"
         ],
-        "no-unused-vars": "off",
         "react/jsx-closing-bracket-location": [
           "warn",
           {
